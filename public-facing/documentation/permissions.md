@@ -1,5 +1,7 @@
 # Data, connection, and write permissions
 
+Every installation connects the installer's own provider accounts. For Slack, the installer selects and authorizes their own workspace, app or connector, channels, and users. A host's ability to support Slack does not mean that connection is already configured. Follow [Connect your own Slack workspace](slack.md) and verify the workspace-to-profile binding before sharing case context.
+
 Sherlock's local MCP process is bound to one data directory and profile at startup. Its tools cannot select another profile. A profile is an organizational boundary within the trusted operating-system account, not a hosted multi-tenant authentication system. Anyone who can read its files or control its process may access its records.
 
 ## Choose where data lives

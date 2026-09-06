@@ -105,9 +105,12 @@ or return on ad spend. Findings retain their sources and observation dates.
 - **Choose a connector deliberately.** Composio and custom CRM MCP connections
   require real tool mappings, account identity, permissions, and readback. The
   compatibility guide records what has actually been verified.
-- **Use Slack through your host.** Sherlock's local recall can support your
-  host's authorized Slack workflow. This repository does not install a standalone
-  Slack bot. Website conversations are fictional demonstrations.
+- **Connect your own Slack workspace.** Each installer supplies their own Slack
+  connection, credentials, channel choices, and permissions. The current route
+  uses a Slack-capable host that you configure and authorize; Sherlock's local
+  recall supplies saved context for that workflow. This repository does not
+  install a standalone Slack bot. Follow the [Slack setup guide](public-facing/documentation/slack.md).
+  Website conversations are fictional demonstrations.
 
 Sherlock is free. Model providers and connected services may charge separately.
 See the [release record](docs/RELEASE.md) for test evidence and remaining launch

@@ -2,9 +2,11 @@
 
 Sherlock is a Python MCP service plus five portable instruction skills. Your existing agent supplies the model, research tools, and optional connected services. This development build is installed from source; no package-registry or public repository URL is claimed here. Read the [compatibility status](compatibility.md) before choosing a host.
 
+Each installer connects their own Slack workspace/account using their own app installation and credentials. Installing Sherlock does not connect Slack automatically or supply the author's workspace, app, credentials, or history. The current path uses the installer's selected host to handle Slack; see [Slack setup](slack.md).
+
 ## First run without provider keys
 
-You need Python 3.11 or later and [uv](https://docs.astral.sh/uv/getting-started/installation/). The commands below use a POSIX shell on macOS or Linux. Windows/WSL verification is pending; do not assume native PowerShell syntax or support.
+You need Python 3.11 or later and [uv](https://docs.astral.sh/uv/getting-started/installation/). The commands below use a POSIX shell on macOS or Linux. Runtime tests and the fictional demo pass on Windows with Python 3.11 and 3.13; interactive Windows agent setup and WSL remain unverified. The shell examples below are not native PowerShell commands.
 
 Set the source directory to the folder containing `runtime/`, `skills/`, and `documentation/`. Replace the example path with your downloaded checkout's absolute path. Keep the quotes when it contains spaces. Choose a private data directory outside the checkout.
 
@@ -26,8 +28,8 @@ After replacing the source path, paste this into the local host you want to use:
 
 ```text
 Set up Agent Sherlock from /absolute/path/to/Agent Sherlock/public-facing.
-Read documentation/install.md, documentation/compatibility.md, and
-documentation/permissions.md. Inspect the package's help and configuration
+Read documentation/install.md, documentation/compatibility.md,
+documentation/permissions.md, and documentation/slack.md. Inspect the package's help and configuration
 example. Use a private data directory outside the source checkout. Run doctor
 and the fictional no-provider demo, then register the local stdio MCP server
 with this host and install all five folders from skills/ in its supported
@@ -35,9 +37,15 @@ skills directory. Preserve unrelated host settings and existing skill files;
 show me conflicts before replacing them. Use the same selected profile for
 the host and CLI. Verify tool discovery and case save/read/recall in a test
 profile, then report which checks actually passed. Keep approval-required CRM
-writes as the default. Do not connect an external provider, enable autosave,
-or publish anything as part of this setup. Explain the next optional steps
-for connecting my own CRM once the local workflow works.
+writes as the default. Next resolve my selected Slack workspace/account, my
+app installation and credentials, allowed channels and senders, and the
+Sherlock profile they may access. Resolve my selected CRM account as well.
+Configure those provider connections only within my authorization; use any
+scope I have already authorized and ask only for missing information or scope.
+Do not assume the author or this host has already connected my accounts.
+Keep credentials private. Verify the authorized Slack destination and read
+back any authorized test reply there. Report local recall, Slack delivery,
+and CRM verification separately. Do not enable autosave or publish anything.
 ```
 
 This handoff asks your agent to perform installation. The guide itself has not changed your host settings. Review any host-level prompts your environment requires.
@@ -104,4 +112,10 @@ Ask the host to discover Sherlock's tools and call `sherlock_status`. In a dedic
 
 Do not run `serve` as a background web server: it is a stdio process started by the MCP host and waits for protocol messages on stdin. It does not supply a browser sign-in page or public HTTP endpoint.
 
-Next: [daily recipes](daily-recipes.md), [CRM integrations](integrations.md), [permissions](permissions.md), [operations](operations.md), and [troubleshooting](troubleshooting.md).
+## Connect your own Slack workspace
+
+Follow [slack.md](slack.md) to configure your own workspace and app credentials through your selected host. Resolve the workspace ID, app/bot identity, allowed channel IDs and senders, and the Sherlock profile before enabling access. An existing host's ability to support Slack does not prove your account is connected or authorized.
+
+Verify local recall and an authorized test reply separately, including readback in the intended Slack destination. A standalone Slack bot is not included in this preview; this build uses the selected host's Slack handling.
+
+Next: [daily recipes](daily-recipes.md), [Slack setup](slack.md), [CRM integrations](integrations.md), [permissions](permissions.md), [operations](operations.md), and [troubleshooting](troubleshooting.md).

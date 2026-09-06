@@ -28,9 +28,10 @@ use `--output` with a new path when preparing another candidate. Review
 | Release packaging controls | 19 local tests passed; checked source package and first-commit Git history passed |
 | Runtime, MCP protocol, data lifecycle, mock CRM | 95 tests and 9 subtests passed on the reviewed local candidate; includes 20 fictional personas across independent MCP processes |
 | Fresh source install | Passed with Python 3.11.15, a fresh environment, and an empty dependency cache; 11 CLI operations plus MCP persistence verified |
+| Actual GitHub ZIP install | Commit `078e31b`: all 109 files matched the reviewed package; fresh locked install, doctor, fictional demo, 19 MCP tools, and 13 operations including restart persistence passed |
 | Named agent host | Claude Code 2.1.261 loaded the router and recall skills, saved a fictional case with sourced evidence, and retrieved it after a new host process; initial snapshot `6c5198a` |
 | Live CRM account reads/writes and Slack delivery | Not verified by the fictional demo |
-| GitHub workflow checks | Initial Linux and macOS matrix and distribution job passed; Windows test cleanup corrected, updated matrix pending |
+| GitHub workflow checks | [Run 34010935227](https://github.com/keithsol91/agent-sherlock/actions/runs/34010935227) passed for `078e31b`: Windows, macOS, and Linux on Python 3.11 and 3.13, plus the public distribution job |
 | Software license | Proposed MIT for original code and skills; public release requires owner confirmation |
 | GitHub repository | Created as a private review repository; public visibility and promotion require owner approval |
 
@@ -38,6 +39,13 @@ Review repository: [keithsol91/agent-sherlock](https://github.com/keithsol91/age
 The actual GitHub README, quickstart anchor, and rendered installation guide
 were inspected in an authenticated browser. The local website points to this
 repository; those website edits have not been deployed.
+
+The downloaded GitHub ZIP for full commit
+`078e31bf627463ee181feaf756de5395d3565fa6` was 4,888,080 bytes with SHA-256
+`6ee93cadaad337e879fc8bafd92ea163bb589463b5a2bc36bae3c0a157e9f835`.
+Its source remained byte-identical after the acceptance run. Later changes to
+this release record do not change the runtime tested in that archive. For the
+latest commit, inspect [Release checks](https://github.com/keithsol91/agent-sherlock/actions/workflows/ci.yml).
 
 The Claude Code check used only a temporary MCP configuration, project skill
 folders, and fictional records. It did not alter global agent settings or test

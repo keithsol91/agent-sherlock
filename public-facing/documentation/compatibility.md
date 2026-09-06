@@ -13,7 +13,7 @@ Read this table as a record of what has been checked, not a promise that a match
 | HubSpot via configured adapter | User-owned CRM account and required scopes | Fixture/contract tests and live-account verification are separate. Do not infer a working connection from a successful demo. |
 | Composio or custom CRM MCP | Explicitly mapped gateway tools and account identity | Compatibility depends on actual tool schemas, records, readback, and write policy. Generic MCP support alone is insufficient. |
 | Research sources | Existing host search/browser or user-supplied sources | Sherlock stores evidence; the local service does not itself crawl social platforms or buy research access. |
-| Slack | User's selected host/channel integration | Delivery configuration and end-to-end verification are separate from local recall. A standalone public Slack bot is not implied. |
+| Slack | Installer-owned workspace/account and app or connector credentials, through the selected host | Each installer configures their own connection and workspace/channel/sender/profile binding; see [Slack setup](slack.md). Live delivery/readback remains unverified. A standalone Slack bot is not included in this preview. |
 
 ## How a connection earns a compatibility label
 

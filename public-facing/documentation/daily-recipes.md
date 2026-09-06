@@ -36,9 +36,11 @@ Sherlock can return the context packet. Sending it to another person, workspace,
 
 ## Use Sherlock through Slack
 
-If your chosen host already receives authorized Slack messages, install Sherlock in that host and route the relevant requests to its skills. The Slack workspace/channel configuration controls who can ask and where replies go; the Sherlock profile controls which local case store the process uses. Do not point multiple mutually untrusted Slack users at a single trusted profile and assume channel visibility will enforce case access.
+Each installer must connect their own Slack workspace/account and app or connector credentials using [Slack setup](slack.md). The current route uses your selected host's Slack handling. A standalone Slack bot is not included in this preview.
 
-Use a fictional test case and an authorized test channel to verify recall and delivery separately. The existing website's Slack conversations are authored demonstrations, not successful installation tests for your workspace.
+Bind the verified workspace and app/bot identity, allowed channels and senders, and intended Sherlock profile before routing requests to its skills. The host controls Slack access and reply routing; Sherlock's profile selects the local case store. Do not point mutually untrusted Slack users at a single trusted profile and assume channel visibility will enforce case access.
+
+Use a fictional test case and an authorized test channel to verify recall and delivery separately. Read the authorized reply back in the intended workspace/channel/thread before claiming Slack delivery works. The existing website's Slack conversations are authored demonstrations, not successful installation tests for your workspace.
 
 ## Export and protect your records
 
