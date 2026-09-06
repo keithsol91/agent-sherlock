@@ -1,6 +1,6 @@
 # Install Agent Sherlock from this checkout
 
-Sherlock is a Python MCP service plus five portable instruction skills. Your existing agent supplies the model, research tools, and optional connected services. This development build is installed from source; no package-registry or public repository URL is claimed here. Read the [compatibility status](compatibility.md) before choosing a host.
+Sherlock is a Python MCP service plus five portable instruction skills. Your existing agent supplies the model, research tools, and optional connected services. This preview is installed from the [GitHub source repository](https://github.com/keithsol91/agent-sherlock). Read the [compatibility status](compatibility.md) before choosing a host.
 
 Each installer connects their own Slack workspace/account using their own app installation and credentials. Installing Sherlock does not connect Slack automatically or supply the author's workspace, app, credentials, or history. The current path uses the installer's selected host to handle Slack; see [Slack setup](slack.md).
 

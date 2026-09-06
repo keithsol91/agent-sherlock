@@ -1,8 +1,8 @@
 # Third-party notices and artwork
 
-The [MIT license](LICENSE) in this review candidate applies to original Sherlock
-code and skill instructions. Public release of this candidate awaits owner
-approval. It does not relicense the third-party materials or brand marks below.
+The [MIT license](LICENSE) applies to original Sherlock code and skill
+instructions. It does not relicense the third-party materials or brand marks
+below.
 
 ## Fonts
 

@@ -1,7 +1,8 @@
 # Release verification
 
-Candidate: **0.1.0a1**. This document records verification, not public launch
-approval. Update it from actual command results before promoting this build.
+Release: **0.1.0a1**. The owner approved MIT licensing and public GitHub
+publication on 6 September 2026. This document records verification and the
+scope of that release.
 
 ## Distribution contract
 
@@ -31,11 +32,12 @@ use `--output` with a new path when preparing another candidate. Review
 | Actual GitHub ZIP install | Commit `078e31b`: all 109 files matched the reviewed package; fresh locked install, doctor, fictional demo, 19 MCP tools, and 13 operations including restart persistence passed |
 | Named agent host | Claude Code 2.1.261 loaded the router and recall skills, saved a fictional case with sourced evidence, and retrieved it after a new host process; initial snapshot `6c5198a` |
 | Live CRM account reads/writes and Slack delivery | Not verified by the fictional demo |
-| GitHub workflow checks | [Run 34010935227](https://github.com/keithsol91/agent-sherlock/actions/runs/34010935227) passed for `078e31b`: Windows, macOS, and Linux on Python 3.11 and 3.13, plus the public distribution job |
-| Software license | Proposed MIT for original code and skills; public release requires owner confirmation |
-| GitHub repository | Created as a private review repository; public visibility and promotion require owner approval |
+| GitHub workflow checks | [Run 34011393286](https://github.com/keithsol91/agent-sherlock/actions/runs/34011393286) passed for `39d8541`: Windows, macOS, and Linux on Python 3.11 and 3.13, plus the public distribution job |
+| Software license | MIT for original code and skills, confirmed by the owner on 6 September 2026; artwork and third-party notices retain their stated scope |
+| GitHub publication | Owner-authorized public repository and preview release; inspect the repository and release links for current availability |
 
-Review repository: [keithsol91/agent-sherlock](https://github.com/keithsol91/agent-sherlock).
+Repository: [keithsol91/agent-sherlock](https://github.com/keithsol91/agent-sherlock).
+Preview release: [v0.1.0a1](https://github.com/keithsol91/agent-sherlock/releases/tag/v0.1.0a1).
 The actual GitHub README, quickstart anchor, and rendered installation guide
 were inspected in an authenticated browser. The local website points to this
 repository; those website edits have not been deployed.
