@@ -1,0 +1,34 @@
+name: Bug report
+description: Report a reproducible Sherlock problem using fictional data.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "Do not paste tokens, provider URLs containing credentials, customer records, or raw CRM/Slack exports. For vulnerabilities, read SECURITY.md."
+  - type: input
+    id: version
+    attributes:
+      label: Version and platform
+      placeholder: "Commit or release, OS, Python version, agent host"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include exact commands and small fictional inputs.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Summarize errors with sensitive details removed.
+    validations:
+      required: true

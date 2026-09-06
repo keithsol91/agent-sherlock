@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Set up Agent Sherlock’s skills and local MCP service for sourced competitor research, account context, living case files, and recall." />
+    <title>Setup &amp; docs — Agent Sherlock</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="assets/styles/fonts.css" />
+    <link rel="stylesheet" href="assets/styles/tokens.css" />
+    <link rel="stylesheet" href="assets/styles/components.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="sherlock">
+    <a class="sherlock-skip-link" href="#main">Skip to content</a>
+    <header class="sherlock-container sherlock-nav site-header">
+      <a class="sherlock-brand" href="index.html"><span>Agent Sherlock</span></a>
+      <nav aria-label="Primary navigation">
+        <ul class="sherlock-nav-list">
+          <li><a class="sherlock-nav-link" href="index.html#capabilities">Skills</a></li>
+          <li><a class="sherlock-nav-link" href="docs.html" aria-current="page">Docs</a></li>
+          <li><a class="sherlock-nav-link" href="#contribute">Contribute</a></li>
+          <li><span class="repository-pending">GitHub <span class="sherlock-caption sherlock-muted">coming soon</span></span></li>
+        </ul>
+      </nav>
+    </header>
+    <main id="main" class="sherlock-container" tabindex="-1">
+      <div class="docs-header">
+        <p class="sherlock-eyebrow">Skills + a local MCP service</p>
+        <h1>Put Sherlock on the case.</h1>
+        <p class="sherlock-lead sherlock-prose">Give your agent a place to keep sourced research, account context, and earlier findings. Start with fictional examples, then connect the tools your work needs.</p>
+      </div>
+      <div class="docs-layout">
+        <details class="docs-contents">
+          <summary>On this page</summary>
+          <nav aria-label="On this page">
+            <ul>
+            <li><a class="sherlock-link" href="#getting-started">Get started</a></li>
+            <li><a class="sherlock-link" href="#availability">What is included</a></li>
+            <li><a class="sherlock-link" href="#slack">Sherlock in Slack</a></li>
+            <li><a class="sherlock-link" href="#social-research">Social research</a></li>
+            <li><a class="sherlock-link" href="#crm">CRM and accounts</a></li>
+            <li><a class="sherlock-link" href="#case-files">Living case files</a></li>
+            <li><a class="sherlock-link" href="#recall">Recall for other agents</a></li>
+            <li><a class="sherlock-link" href="#compatibility">Agent compatibility</a></li>
+            <li><a class="sherlock-link" href="#contribute">Contribute</a></li>
+            </ul>
+          </nav>
+        </details>
+        <div class="docs-prose">
+          <section id="getting-started" aria-labelledby="getting-started-title">
+            <h2 id="getting-started-title">Start with the local service.</h2>
+            <p>Sherlock runs on your computer and connects to an agent through the Model Context Protocol (MCP). You need Python 3.11 or newer, <code>uv</code>, and an agent host that can launch a local MCP process. Your host supplies the model and research tools.</p>
+            <ol>
+              <li><strong>Get the source and install the runtime.</strong> The repository includes the Python package, a locked dependency file, and the skill files. Use the commands below from the repository root.</li>
+              <li><strong>Check the local setup and try fictional data.</strong> Run the documented doctor and demo commands before connecting any provider. The examples let you inspect case storage and recall with no CRM credentials.</li>
+              <li><strong>Connect your agent and load the skills.</strong> Configure the host to launch Sherlock’s MCP service, then install the workflow skills using that host’s documented method. Keep the runtime path absolute in host configuration.</li>
+            </ol>
+            <p>From the repository root, run these commands in a macOS or Linux terminal:</p>
+            <div class="sherlock-code">
+              <pre tabindex="0" role="region" aria-label="Local setup commands"><code>uv sync --project public-facing/runtime --frozen
+uv run --project public-facing/runtime sherlock doctor
+uv run --project public-facing/runtime sherlock demo</code></pre>
+            </div>
+            <p>Doctor should report local storage as ready. The demo should return clearly labeled fictional cases and recall results from its separate demo profile. Data goes into Sherlock’s local application-data directory, outside the source checkout.</p>
+            <details class="docs-prompt">
+              <summary>Give this setup prompt to your agent</summary>
+              <p>Replace the source path with your checkout’s absolute path, then paste this into the local agent you want to use:</p>
+              <div class="sherlock-code">
+                <pre tabindex="0" role="region" aria-label="Agent setup prompt"><code>Set up Agent Sherlock from
+/absolute/path/to/Agent Sherlock/public-facing.
+Read documentation/install.md, compatibility.md,
+and permissions.md in its documentation folder.
+Use a private data directory outside the checkout.
+Run doctor and the fictional no-provider demo.
+Register its local stdio MCP service with this host
+and install all five skills using this host's
+supported method. Preserve unrelated settings
+and existing skill files; show conflicts first.
+Verify tool discovery and case save/read/recall
+in a test profile, and report what passed.
+Keep CRM approval required. Do not connect a
+provider, enable autosave, or publish anything.</code></pre>
+              </div>
+            </details>
+            <p>The full installation guide includes host-specific configuration recipes. These reference files are Markdown documents and may download in your browser.</p>
+            <p><a class="sherlock-button" href="documentation/install.md" download>Download installation guide</a></p>
+            <p>Already installed? Read the <a class="sherlock-link" href="documentation/daily-recipes.md">daily workflow recipes (Markdown)</a> or check the <a class="sherlock-link" href="documentation/compatibility.md">compatibility record (Markdown)</a>.</p>
+            <p class="sherlock-caption sherlock-muted">Sherlock is free. Model providers and connected services may charge separately. The website is an overview; your agent is the working interface.</p>
+          </section>
+          <section id="availability" aria-labelledby="availability-title">
+            <h2 id="availability-title">What is in the alpha?</h2>
+            <p>The source bundle includes five skill files and a local Python MCP service. The skills guide the work; the service supplies persistent case evidence, recall, and controlled CRM workflows. Read the setup guide for the current command and tool contracts.</p>
+            <ul>
+              <li><a class="sherlock-link" href="skills/agent-sherlock/SKILL.md">Agent Sherlock</a> chooses the appropriate workflow and establishes evidence and permission rules.</li>
+              <li><a class="sherlock-link" href="skills/sherlock-competitor-research/SKILL.md">Competitor research</a> turns available public sources into a dated, sourced brief.</li>
+              <li><a class="sherlock-link" href="skills/sherlock-account-context/SKILL.md">Account context</a> matches records and manages proposed CRM changes.</li>
+              <li><a class="sherlock-link" href="skills/sherlock-case-files/SKILL.md">Case files</a> preserves evidence, corrections, and investigation history.</li>
+              <li><a class="sherlock-link" href="skills/sherlock-recall/SKILL.md">Recall</a> retrieves prior evidence for an answer or another agent.</li>
+            </ul>
+            <p>Live provider connections are optional and must be configured separately. A configured connector is not evidence that authentication, permissions, or a real read-and-write workflow has passed. The <a class="sherlock-link" href="#compatibility">compatibility notes</a> explain that boundary.</p>
+          </section>
+          <section id="slack" aria-labelledby="slack-docs-title">
+            <h2 id="slack-docs-title">Work with Sherlock in Slack</h2>
+            <p>A host with its own Slack integration can make Slack the place your team asks Sherlock questions. For example: who have we worked with across medical, finance, automotive, or another industry? The answer comes from the history and context available to the host and the selected Sherlock profile.</p>
+            <p>That makes recall useful in an ordinary conversation: find relevant past clients, count recorded engagements, or bring project experience into a pitch. The answer depends on which records are available; a missing record should not be treated as proof that the work never happened.</p>
+            <p><a class="sherlock-link" href="index.html#slack">See the Slack conversation examples</a>. The screenshots use fictional names, counts, and project descriptions. Their answer format illustrates the intended public experience.</p>
+            <p>This source bundle does not install a Slack app or import workspace history. Slack delivery, workspace access, and channel permissions belong to your configured host. Connecting the local MCP service does not connect Slack.</p>
+          </section>
+          <section id="social-research" aria-labelledby="social-title">
+            <h2 id="social-title">Investigate competitors’ social presence</h2>
+            <p>Start with a company, its competitors, verified public accounts, and a question or time window. The competitor research skill guides your host through the sources it can access and produces a brief with findings, source links, open questions, and ideas to test.</p>
+            <ul>
+              <li><strong>Organic content:</strong> compare topics, formats, hooks, calls to action, and posting patterns.</li>
+              <li><strong>Community:</strong> examine public audience questions, objections, and brand responses.</li>
+              <li><strong>Paid creative:</strong> compare visible ad concepts and messages where public evidence is available.</li>
+              <li><strong>Next steps:</strong> turn supported findings into focused content and strategy experiments.</li>
+            </ul>
+            <p>Sherlock’s local service does not include a web crawler or model. Your host can use its own research tools or sources you provide. Unavailable, restricted, failed, and unattempted sources remain explicit; they do not mean a competitor has no activity.</p>
+            <p>Sources and dates belong with the findings. Public ads alone do not establish spend, targeting, conversions, or return on ad spend. Separate source claims, observations, inferences, and recommendations.</p>
+          </section>
+          <section id="crm" aria-labelledby="crm-title">
+            <h2 id="crm-title">Keep leads and accounts in context</h2>
+            <p>Research a lead or company, connect the findings to the right existing record, and keep useful facts close to the next account conversation. Social research is one source of that context; company and contact research also matter.</p>
+            <p>The account context skill reads a configured connection, resolves the correct record, and prepares field-level changes with supporting evidence. External changes require approval of the specific proposal unless an active, explicit policy already covers that provider, account, action, and fields.</p>
+            <p>A proposal has not been saved to the CRM. A provider acknowledgment and a verified destination readback are separate outcomes. Use Sherlock’s controlled workflow and report its actual result.</p>
+            <p>In the approval-required workflow, review the exact proposal in your own terminal before the agent applies it. The MCP agent cannot approve its own proposal. The account recipe explains this step.</p>
+            <p>Connections are not enabled by installing the skills. Configure credentials and permissions outside the repository, then verify the selected account and supported operations before using a provider. Live provider and host tests are separate from the local test suite.</p>
+          </section>
+          <section id="case-files" aria-labelledby="cases-title">
+            <h2 id="cases-title">Build a living case file</h2>
+            <p>A case file keeps the research around a company or question together: facts, social signals, source links, account history, open questions, and the next useful action.</p>
+            <p>The local service stores evidence in a profile on your computer. Reuse the correct case as an investigation develops, record observation dates and provenance, and preserve corrections through the supported case tools. After saving, read the case back to confirm the intended evidence is present.</p>
+            <p>Keep unrelated customers or teams in separately configured profiles. A shared local profile is a shared data boundary; it is not per-user access control. Exported cases and backups are additional copies of the same information.</p>
+          </section>
+          <section id="recall" aria-labelledby="recall-title">
+            <h2 id="recall-title">Remember for the rest of your agents</h2>
+            <p>Recall retrieves the relevant facts from earlier work. A strategy agent might need the last competitor brief, a content agent the creative patterns, and a sales agent the account history.</p>
+            <p>The recall skill retrieves facts with their source, observation time, case reference, and uncertainty. Inspect the underlying evidence before making a precise claim. Older observations are dated context, not proof of the current situation.</p>
+            <p>A search result is not a complete client census. Distinguish companies from engagements, check coverage, and label fictional fixtures. No relevant result means nothing matching was found in the searched material.</p>
+            <p>Retrieving context does not deliver it to another person or agent. Your host handles any separately authorized handoff. See the <a class="sherlock-link" href="#compatibility">agent compatibility notes</a>.</p>
+          </section>
+          <section id="compatibility" aria-labelledby="compatibility-title">
+            <h2 id="compatibility-title">Built to work with your agents</h2>
+            <p>Sherlock supplies a local MCP service and portable Markdown skill files. Host support depends on whether your agent can launch that service and how it loads skills. Each host needs its own installation instructions and verification.</p>
+            <p>Claude Code, ChatGPT, Hermes Agent, and OpenClaw are compatibility targets. Their names are not a claim that every host, product tier, or connection method has been tested. A hosted chat interface may require a remote connector that this local setup does not provide.</p>
+            <p><strong>Verify the actual host connection.</strong> Confirm that the host can list Sherlock’s tools, read its status, save fictional evidence, and retrieve that evidence before relying on the setup. Real research, Slack, and CRM access each need their own checks.</p>
+            <p>The <a class="sherlock-link" href="documentation/compatibility.md">compatibility record</a> distinguishes documented setup, protocol and fixture tests, host tests, and live provider reads and writes.</p>
+            <p>Claude and Claude Code are Anthropic brands; ChatGPT and the OpenAI logo belong to OpenAI. Hermes Agent and OpenClaw names and marks belong to their respective owners. Logos identify the tools discussed here, not partnerships or endorsements.</p>
+          </section>
+          <section id="contribute" aria-labelledby="contribute-title">
+            <h2 id="contribute-title">Help shape Sherlock</h2>
+            <p>Start with the <a class="sherlock-link" href="README.md">source bundle README</a> and the workflow skills. Useful contributions make setup easier, preserve better evidence, or improve a host or provider connection with reproducible verification.</p>
+            <p>Use fictional data for examples and tests. A useful bug report includes the command or tool call, expected and actual behavior, and the runtime and host versions. Remove credentials, personal information, and customer records before sharing it.</p>
+            <p>Sherlock is free. Model providers and connected services may charge separately.</p>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer class="sherlock-footer sherlock-container">
+      <a class="sherlock-brand" href="index.html"><span>Agent Sherlock</span></a>
+      <a class="sherlock-nav-link" href="index.html">Back to the homepage</a>
+    </footer>
+  </body>
+</html>

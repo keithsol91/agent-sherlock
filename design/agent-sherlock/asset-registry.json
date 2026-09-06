@@ -1,0 +1,26 @@
+{
+  "schema": "agent-sherlock-asset-registry-v1",
+  "version": "1.0.0",
+  "updated": "2026-09-06",
+  "notes": [
+    "Only reference-homepage is supplied art. Other entries are specifications, not existing files.",
+    "The realistic watercolor portrait is historical context only and must not be used as a style source.",
+    "All future production art must be reviewed against the approved cartoon reference."
+  ],
+  "assets": [
+    {"id":"reference-homepage","status":"approved-reference","path":"reference/approved-homepage.png","format":"png","width":921,"height":1708,"transparent":false,"usage":"Character and homepage visual source; not an implemented page or asset sheet"},
+    {"id":"sherlock-hero","status":"specified-not-produced","path":null,"targetWidth":1600,"targetHeight":1600,"formats":["png","webp"],"transparent":true,"usage":"Homepage inspecting pose"},
+    {"id":"sherlock-avatar","status":"specified-not-produced","path":null,"targetWidth":1024,"targetHeight":1024,"formats":["png"],"transparent":true,"usage":"GitHub avatar; dedicated simplification for small sizes"},
+    {"id":"sherlock-head-small","status":"specified-not-produced","path":null,"sizes":[32,48,64],"formats":["png"],"transparent":true,"usage":"Small navigation identity"},
+    {"id":"wordmark-horizontal","status":"specified-not-produced","path":null,"formats":["svg","png"],"requiresTrueVector":true,"usage":"Head icon and Agent Sherlock wordmark"},
+    {"id":"skill-competitors","status":"specified-not-produced","path":null,"targetWidth":640,"targetHeight":480,"formats":["png","webp"],"transparent":true,"usage":"Binoculars and paper clues"},
+    {"id":"skill-crm","status":"specified-not-produced","path":null,"targetWidth":640,"targetHeight":480,"formats":["png","webp"],"transparent":true,"usage":"Contact record, pencil, check"},
+    {"id":"skill-case-files","status":"specified-not-produced","path":null,"targetWidth":640,"targetHeight":480,"formats":["png","webp"],"transparent":true,"usage":"Three-tab folder"},
+    {"id":"skill-shared-context","status":"specified-not-produced","path":null,"targetWidth":640,"targetHeight":480,"formats":["png","webp"],"transparent":true,"usage":"Detectives passing one fact card"},
+    {"id":"example-case","status":"specified-not-produced","path":null,"targetWidth":1200,"targetHeight":900,"formats":["png","webp"],"transparent":true,"usage":"Case folder vignette; all essential text separate"},
+    {"id":"books-and-hat","status":"specified-not-produced","path":null,"targetWidth":1000,"targetHeight":800,"formats":["png","webp"],"transparent":true,"usage":"Three books and deerstalker for the participation section; readable text stays separate"},
+    {"id":"sherlock-welcome","status":"specified-not-produced","path":null,"targetWidth":1200,"targetHeight":1200,"formats":["png","webp"],"transparent":true,"usage":"Getting started and documentation"},
+    {"id":"social-preview","status":"specified-not-produced","path":null,"targetWidth":1200,"targetHeight":630,"formats":["png"],"transparent":false,"usage":"GitHub/social preview; 72 px safe area"},
+    {"id":"favicon-set","status":"specified-not-produced","path":null,"sizes":[16,32,48],"formats":["png","ico","svg"],"usage":"Browser icon with separately simplified geometry"}
+  ]
+}

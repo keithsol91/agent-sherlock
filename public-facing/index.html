@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Meet Agent Sherlock: an AI detective for social competitor research, account context, living case files, and shared memory for your team of agents. Public edition in development." />
+    <title>Agent Sherlock — Social intelligence for your team</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="assets/styles/fonts.css" />
+    <link rel="stylesheet" href="assets/styles/tokens.css" />
+    <link rel="stylesheet" href="assets/styles/components.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="assets/examples/slack-examples.js" defer></script>
+    <script src="slack-gallery.js" defer></script>
+  </head>
+  <body class="sherlock">
+    <a class="sherlock-skip-link" href="#main">Skip to content</a>
+    <header class="sherlock-container sherlock-nav site-header">
+      <a class="sherlock-brand" href="index.html" aria-label="Agent Sherlock home"><span>Agent Sherlock</span></a>
+      <nav aria-label="Primary navigation">
+        <ul class="sherlock-nav-list">
+          <li><a class="sherlock-nav-link" href="#capabilities">Skills</a></li>
+          <li><a class="sherlock-nav-link" href="docs.html">Docs</a></li>
+          <li><a class="sherlock-nav-link" href="docs.html#contribute">Contribute</a></li>
+          <li><span class="repository-pending">GitHub <span class="sherlock-caption sherlock-muted">coming soon</span></span></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section class="sherlock-hero sherlock-container" aria-labelledby="hero-title">
+        <div class="sherlock-hero-copy">
+          <p class="sherlock-eyebrow">Social intelligence for your team</p>
+          <h1 id="hero-title">Meet your new AI detective.</h1>
+          <p class="sherlock-lead">Sherlock investigates competitors’ social activity, researches leads and accounts, keeps CRM and case files current, and remembers the facts your other agents need.</p>
+          <div class="sherlock-actions">
+            <a class="sherlock-button" href="#capabilities">Explore Sherlock’s skills</a>
+            <a class="sherlock-link" href="docs.html">Read the docs</a>
+          </div>
+          <p class="sherlock-caption sherlock-muted">Public edition in development. Explore what we’re building.</p>
+          <a class="slack-entry sherlock-link" href="#slack"><img src="assets/brands/slack-logo.svg" width="24" height="24" alt="" /> Meet Sherlock in Slack</a>
+        </div>
+        <img class="sherlock-hero-art" src="assets/sherlock-hero-candidate.png" width="1312" height="1199" alt="Sherlock examining a clue with a magnifying glass behind a blue case folder" fetchpriority="high" />
+      </section>
+
+      <section id="agents" class="sherlock-section sherlock-container agent-compatibility" aria-labelledby="agents-title">
+        <h2 id="agents-title">Built to work with your agents.</h2>
+        <p class="agent-compatibility-intro">Your tools. Sherlock’s skills and context. The goal is to make useful research and memory portable across the agents you already use.</p>
+        <ul class="agent-logo-list" aria-label="Planned agent compatibility">
+          <li><img src="assets/brands/claude-mark.png" width="32" height="32" alt="" /><span>Claude Code</span></li>
+          <li><img src="assets/brands/chatgpt-mark.svg" width="32" height="32" alt="" /><span>ChatGPT</span></li>
+          <li><img src="assets/brands/hermes-mark.png" width="32" height="32" alt="" /><span>Hermes Agent</span></li>
+          <li><img src="assets/brands/openclaw-mark.svg" width="32" height="32" alt="" /><span>OpenClaw</span></li>
+          <li class="agent-logo-more">And more.</li>
+        </ul>
+        <p class="sherlock-caption sherlock-muted agent-compatibility-note"><strong>Planned compatibility.</strong> Public setup and supported features are still being validated for each tool. <a class="sherlock-link" href="docs.html#compatibility">Compatibility details</a></p>
+      </section>
+
+      <section id="capabilities" class="sherlock-section sherlock-container" aria-labelledby="capabilities-title">
+        <div class="section-intro">
+          <h2 id="capabilities-title">A few things Sherlock can do.</h2>
+          <p>Built around social research, with useful context for sales, strategy, and the rest of your agents. These are the planned capabilities of the public edition.</p>
+        </div>
+        <ul class="sherlock-skills">
+          <li class="sherlock-skill">
+            <span class="skill-index" aria-hidden="true">01</span>
+            <h3>Investigate competitors</h3>
+            <p>Explore social content, audience conversations, and visible paid creative. Turn the evidence into a focused competitor brief.</p>
+            <a class="sherlock-link skill-detail" href="docs.html#social-research">Social research</a>
+          </li>
+          <li class="sherlock-skill">
+            <span class="skill-index" aria-hidden="true">02</span>
+            <h3>Keep your CRM current</h3>
+            <p>Research leads and accounts, read existing records, and add relevant facts with the sources behind them.</p>
+            <a class="sherlock-link skill-detail" href="docs.html#crm">Account intelligence</a>
+          </li>
+          <li class="sherlock-skill">
+            <span class="skill-index" aria-hidden="true">03</span>
+            <h3>Build living case files</h3>
+            <p>Keep company context, social signals, evidence, and account history together as an investigation develops.</p>
+            <a class="sherlock-link skill-detail" href="docs.html#case-files">Connected evidence</a>
+          </li>
+          <li class="sherlock-skill">
+            <span class="skill-index" aria-hidden="true">04</span>
+            <h3>Remember for the team</h3>
+            <p>Give your sales, strategy, and content agents relevant facts from earlier work, with sources they can revisit.</p>
+            <a class="sherlock-link skill-detail" href="docs.html#recall">Shared context</a>
+          </li>
+        </ul>
+      </section>
+
+      <section id="slack" class="sherlock-section sherlock-container" aria-labelledby="slack-title">
+        <div class="slack-section-heading">
+          <div class="slack-brand-label"><img src="assets/brands/slack-logo.svg" width="32" height="32" alt="Slack" /><p class="sherlock-eyebrow">Sherlock in Slack</p></div>
+          <h2 id="slack-title">Your team’s experience,<br class="desktop-break" /> a Slack message away.</h2>
+          <p class="sherlock-lead">Medical, finance, automotive, and beyond. Ask Sherlock who you’ve worked with, how many clients fit an industry, or what your team did for them. He draws on the history and context available to him, right in Slack.</p>
+        </div>
+        <div id="slack-industry-picker" class="slack-industry-picker" role="group" aria-label="Choose an example industry" hidden>
+          <button type="button" class="industry-button" data-industry="medical" aria-pressed="true" aria-controls="slack-example">Medical</button>
+          <button type="button" class="industry-button" data-industry="finance" aria-pressed="false" aria-controls="slack-example">Finance</button>
+          <button type="button" class="industry-button" data-industry="automotive" aria-pressed="false" aria-controls="slack-example">Automotive</button>
+        </div>
+        <figure id="slack-example" class="slack-example" aria-labelledby="slack-caption">
+          <picture>
+            <source id="slack-mobile-image" media="(max-width: 639px)" srcset="assets/examples/slack-medical-mobile.png" />
+            <img id="slack-screenshot" class="slack-screenshot" src="assets/examples/slack-medical-desktop.png" width="1120" height="740" alt="Illustrative Slack screenshot: a teammate asks about medical experience and Sherlock lists three fictional clients and their project work." loading="lazy" />
+          </picture>
+          <figcaption id="slack-caption"><strong id="slack-industry-caption">Medical experience</strong><span>Illustrative conversation. All clients, counts, and messages are fictional.</span></figcaption>
+        </figure>
+        <p id="slack-gallery-status" class="sherlock-visually-hidden" role="status" aria-live="polite"></p>
+        <div class="slack-example-details">
+          <details class="slack-transcript">
+            <summary>Read the conversation</summary>
+            <div id="slack-transcript-copy">
+              <p><strong>Alex:</strong> @Sherlock who have we worked with in the medical space?</p>
+              <p><strong>Agent Sherlock:</strong> I found 3 medical clients in the project history available to me: Pine &amp; Vale Health, Orchard Medical Group, and Beaconwell Clinics.</p>
+              <p>This is a fictional demonstration of recalling past client work.</p>
+            </div>
+          </details>
+          <a id="slack-screenshot-link" class="sherlock-link" href="assets/examples/slack-medical-desktop.png">View full-size screenshot</a>
+        </div>
+        <noscript><p class="sherlock-caption">More screenshots: <a class="sherlock-link" href="assets/examples/slack-finance-desktop.png">Finance</a> and <a class="sherlock-link" href="assets/examples/slack-automotive-desktop.png">Automotive</a>.</p></noscript>
+        <div class="slack-context-notes">
+          <p><strong>Build Sherlock into your Slack workflow.</strong> Ask who you’ve worked with, how many clients fit an industry, and what the team did for them.</p>
+          <p><strong>Built around the context he has.</strong> The answer reflects the records Sherlock can access, so the source history and any gaps matter.</p>
+        </div>
+        <p class="sherlock-caption sherlock-muted slack-availability">Based on the team’s existing Slack workflow. Setup for the public edition is in development. <a class="sherlock-link" href="docs.html#slack">How Sherlock fits into Slack</a></p>
+      </section>
+
+      <section id="workflow" class="sherlock-section sherlock-container" aria-labelledby="workflow-title">
+        <div class="sherlock-case-panel">
+          <div class="workflow-heading">
+            <p class="sherlock-eyebrow">Example workflow</p>
+            <h2 id="workflow-title">From a clue to shared context.</h2>
+          </div>
+          <div class="example-question">
+            <p class="sherlock-caption sherlock-muted">A question for Sherlock</p>
+            <h3>What changed in our competitor’s social strategy?</h3>
+            <p>Follow a new content pattern from the public posts that reveal it to the account context your team can use.</p>
+            <p class="sherlock-caption sherlock-muted">Fictional example of the planned workflow.</p>
+          </div>
+          <ol class="workflow-steps">
+            <li>
+              <h3>Find a social signal</h3>
+              <p>A competitor starts a recurring customer-story series. Gather the posts and note what changed.</p>
+            </li>
+            <li>
+              <h3>Connect it to the account</h3>
+              <p>Add the evidence to its case file and prepare a sourced CRM note for review.</p>
+            </li>
+            <li>
+              <h3>Give other agents the context</h3>
+              <p>A content agent plans a test. A sales agent brings the same finding to the next account conversation.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <section id="open-source" class="sherlock-section sherlock-container participation" aria-labelledby="open-source-title">
+        <div class="sherlock-stack">
+          <h2 id="open-source-title">Your detective. Your repo to explore.</h2>
+          <p class="sherlock-lead">The plan: free, open-source software you can use, inspect, and extend for your own team of agents.</p>
+          <div class="sherlock-actions">
+            <a class="sherlock-button" href="docs.html">Explore the project</a>
+            <a class="sherlock-link" href="docs.html#contribute">Help shape Sherlock</a>
+          </div>
+          <p class="sherlock-caption sherlock-muted">The GitHub repository and software license are being prepared.</p>
+          <p class="sherlock-caption sherlock-muted">Sherlock is free. Model providers and connected services may charge separately.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer class="sherlock-footer sherlock-container">
+      <a class="sherlock-brand" href="index.html"><span>Agent Sherlock</span></a>
+      <nav aria-label="Footer navigation">
+        <ul class="sherlock-nav-list">
+          <li><a class="sherlock-nav-link" href="docs.html">Docs</a></li>
+          <li><span class="repository-pending sherlock-muted">GitHub coming soon</span></li>
+          <li><a class="sherlock-nav-link" href="docs.html#contribute">Contribute</a></li>
+        </ul>
+      </nav>
+    </footer>
+  </body>
+</html>

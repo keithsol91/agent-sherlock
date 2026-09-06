@@ -1,0 +1,23 @@
+{
+  "profile": "personal",
+  "connections": {
+    "my-crm": {
+      "provider": "custom-mcp",
+      "account_id": "REPLACE_WITH_VERIFIED_CRM_ACCOUNT_ID",
+      "transport": {
+        "type": "streamable_http",
+        "url": "https://replace-with-your-mcp-endpoint.invalid/mcp",
+        "headers_from_env": {
+          "Authorization": "SHERLOCK_CRM_AUTHORIZATION"
+        }
+      },
+      "operations": {}
+    }
+  },
+  "policy": {
+    "autosave": {
+      "enabled": false,
+      "rules": []
+    }
+  }
+}

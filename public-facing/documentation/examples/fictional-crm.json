@@ -1,0 +1,137 @@
+{
+  "connections": {
+    "fictional-demo": {
+      "provider": "fictional-crm",
+      "account_id": "fictional-account",
+      "transport": {
+        "type": "fictional_fixture",
+        "state_path": "/absolute/path/to/private/sherlock-data/demo/demo-crm.json"
+      },
+      "operations": {
+        "identify_account": {
+          "tool": "fictional_account",
+          "input_schema": {
+            "type": "object",
+            "properties": {},
+            "additionalProperties": false
+          },
+          "arguments": {},
+          "result": {
+            "account_id": "account_id",
+            "record_id": "id",
+            "fields": "fields",
+            "records": "records",
+            "next_cursor": "next_cursor"
+          }
+        },
+        "get_record": {
+          "tool": "fictional_get_record",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "account_id": {
+                "type": "string"
+              },
+              "record_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "account_id",
+              "record_id"
+            ],
+            "additionalProperties": false
+          },
+          "arguments": {
+            "account_id": "$account_id",
+            "record_id": "$record_id"
+          },
+          "result": {
+            "account_id": "account_id",
+            "record_id": "id",
+            "fields": "fields",
+            "records": "records",
+            "next_cursor": "next_cursor"
+          }
+        },
+        "search_records": {
+          "tool": "fictional_search_records",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "account_id": {
+                "type": "string"
+              },
+              "query": {
+                "type": "string"
+              },
+              "limit": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "account_id",
+              "query",
+              "limit"
+            ],
+            "additionalProperties": false
+          },
+          "arguments": {
+            "account_id": "$account_id",
+            "query": "$query",
+            "limit": "$limit"
+          },
+          "result": {
+            "account_id": "account_id",
+            "record_id": "id",
+            "fields": "fields",
+            "records": "records",
+            "next_cursor": "next_cursor"
+          }
+        },
+        "update_fields": {
+          "tool": "fictional_update_fields",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "account_id": {
+                "type": "string"
+              },
+              "record_id": {
+                "type": "string"
+              },
+              "fields": {
+                "type": "object"
+              }
+            },
+            "required": [
+              "account_id",
+              "record_id",
+              "fields"
+            ],
+            "additionalProperties": false
+          },
+          "arguments": {
+            "account_id": "$account_id",
+            "record_id": "$record_id",
+            "fields": "$fields"
+          },
+          "result": {
+            "account_id": "account_id",
+            "record_id": "id",
+            "fields": "fields",
+            "records": "records",
+            "next_cursor": "next_cursor"
+          }
+        }
+      }
+    }
+  },
+  "profile": "demo",
+  "policy": {
+    "autosave": {
+      "enabled": false,
+      "rules": []
+    }
+  }
+}

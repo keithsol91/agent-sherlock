@@ -1,0 +1,25 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agent-sherlock"
+version = "0.1.0a1"
+description = "Local evidence, case files, recall, and controlled CRM tools for your agent."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["mcp==2.1.1"]
+
+[project.scripts]
+sherlock = "agent_sherlock.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.4,<10", "pytest-asyncio>=1,<2"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_sherlock"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+

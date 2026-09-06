@@ -1,0 +1,18 @@
+/* Self-hosted upstream variable font files. See ../fonts/README.md and OFLs. */
+@font-face {
+  font-family: "Fraunces";
+  src: url("../fonts/Fraunces-variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/Inter-variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+/* These declarations load fonts only. Heading/body rules live in components.css. */

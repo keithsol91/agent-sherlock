@@ -1,0 +1,21 @@
+name: Feature or integration request
+description: Explain the workflow and outcome you need.
+title: "[Request] "
+body:
+  - type: textarea
+    id: workflow
+    attributes:
+      label: What are you trying to do?
+      description: Describe the user, trigger, and useful result.
+    validations:
+      required: true
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Required tools and permissions
+      description: For a connector, name the provider and read/write actions. Do not share credentials.
+  - type: textarea
+    id: success
+    attributes:
+      label: How would we verify it works?
+      description: Give a fictional example with an observable result.
