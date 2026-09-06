@@ -16,7 +16,7 @@ and all seven skills, verifies local saving and recall with fictional data, and
 prints the next step. Restart your agent to finish loading the installation.
 Other agents need the generated connection settings added manually.
 
-The package version is 0.2.1a1. Guided setup is included in this release. The
+The package version is 0.2.1a2. Guided setup is included in this release. The
 package is not published to a Python package registry. See the
 [installation guide](../documentation/install.md) for the managed setup path,
 manual path, and custom options.

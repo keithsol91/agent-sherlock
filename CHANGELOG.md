@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1a2 — 6 September 2026
+
+- Simplified the homepage by presenting relationship recovery as numbered capability 05 alongside Sherlock's four existing capabilities, with deeper workflow details linked from the card.
+
 ## 0.2.1a1 — 6 September 2026
 
 - Added a guided, local-first installer for Claude Code, Codex, and manual agent hosts. It copies only reviewed product files, preserves conflicting host settings, verifies fictional local persistence before registration, and does not connect providers or enable writes.

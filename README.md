@@ -17,7 +17,7 @@ case history so you can pick up where you left off.
 · [Compatibility](public-facing/documentation/compatibility.md)
 · [Contribute](CONTRIBUTING.md)
 
-> **Early preview · 0.2.1a1.** The guided setup below is included in this
+> **Early preview · 0.2.1a2.** The guided setup below is included in this
 > release. Host acceptance and provider checks remain separate and are recorded
 > in the compatibility guide.
 

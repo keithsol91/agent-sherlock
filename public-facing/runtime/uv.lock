@@ -9,7 +9,7 @@ resolution-markers = [
 
 [[package]]
 name = "agent-sherlock"
-version = "0.2.1a1"
+version = "0.2.1a2"
 source = { editable = "." }
 dependencies = [
     { name = "mcp" },

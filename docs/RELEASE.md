@@ -1,12 +1,13 @@
 # Release verification
 
-Release: **0.2.1a1**. The owner approved publishing this update on 6 September
+Release: **0.2.1a2**. The owner approved publishing this update on 6 September
 2026. Original code and skills retain the approved MIT license; artwork, fonts,
 and third-party marks retain the scope in [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md).
 
 Repository: [keithsol91/agent-sherlock](https://github.com/keithsol91/agent-sherlock).
-Preview: [v0.2.1a1](https://github.com/keithsol91/agent-sherlock/releases/tag/v0.2.1a1).
-The earlier [v0.2.0a1](https://github.com/keithsol91/agent-sherlock/releases/tag/v0.2.0a1)
+Preview: [v0.2.1a2](https://github.com/keithsol91/agent-sherlock/releases/tag/v0.2.1a2).
+The earlier [v0.2.1a1](https://github.com/keithsol91/agent-sherlock/releases/tag/v0.2.1a1),
+[v0.2.0a1](https://github.com/keithsol91/agent-sherlock/releases/tag/v0.2.0a1),
 and [v0.1.0a1](https://github.com/keithsol91/agent-sherlock/releases/tag/v0.1.0a1)
 releases retain their original tags and artifacts.
 
@@ -20,7 +21,7 @@ releases retain their original tags and artifacts.
 | Seven portable skills | Frontmatter validated; copied skill folders retain their bundled guides and fictional examples with no missing local references |
 | Guided local setup | A disposable managed installation preserved host settings, installed all seven skills, passed MCP save/recall after restart, survived moving the original download, and produced an identical safe rerun |
 | Credential and asset handling | Synthetic tests cover current token forms, credential assignments and URLs, full and bare Bearer values, redaction/rejection, reviewed binary hashes, and reports that never reveal matched values |
-| Homepage relationship section | Desktop and mobile layouts, keyboard link access, local assets, Slack example controls, and zero browser console errors were verified before release preparation |
+| Homepage capability 05 | Relationship recovery sits with the four existing capability cards; desktop and mobile layouts, keyboard link access, local assets, Slack example controls, and zero browser console errors were verified before release preparation |
 | Live CRM, Slack delivery, and relationship source collection | Not verified by these fictional/local checks; each installer configures and verifies their own accounts |
 
 The [Release checks workflow](https://github.com/keithsol91/agent-sherlock/actions/workflows/ci.yml)
@@ -44,7 +45,7 @@ rules and owner-review boundary. All examples and regression records are fiction
 
 ## Upgrade and data compatibility
 
-Release 0.2.1a1 uses the same schema 2 store as 0.2.0a1. Before upgrading an
+Release 0.2.1a2 uses the same schema 2 store as 0.2.1a1 and 0.2.0a1. Before upgrading an
 existing managed or manual installation, stop the profile service, create a
 backup, and review the new release paths. The guided installer preserves a
 different existing Sherlock installation as a conflict; it does not silently
