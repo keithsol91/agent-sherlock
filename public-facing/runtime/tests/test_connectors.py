@@ -103,6 +103,62 @@ async def test_sensitive_provider_values_are_redacted(fixture_gateway, monkeypat
     assert "do-not-return-this" not in json.dumps(result)
 
 
+@pytest.mark.parametrize("header, header_value", [
+    ("Authorization", "Bearer {credential}"),
+    ("authorization", "bearer {credential}"),
+    ("AUTHORIZATION", "\tBEARER\t{credential}\t"),
+    ("Proxy-Authorization", "Bearer {credential}"),
+    ("pRoXy-AuThOrIzAtIoN", "  bEaReR \t {credential}  "),
+])
+async def test_bare_bearer_credentials_are_redacted_from_crm_fields(fixture_gateway, monkeypatch, header, header_value):
+    gateway, transport = fixture_gateway
+    credential = "fictionalOpaqueCredential.17+/=="
+    configured_value = header_value.format(credential=credential)
+    monkeypatch.setenv("SHERLOCK_TEST_BEARER_HEADER", configured_value)
+    gateway.connections["fictional-demo"]["transport"]["headers_from_env"] = {header: "SHERLOCK_TEST_BEARER_HEADER"}
+    transport.records["company-001"].update({
+        "notes": credential,
+        "description": f"Accidental provider echo: {credential}.",
+        "details": [{"text": credential}],
+        "header_echo": configured_value,
+    })
+
+    result = await gateway.read_record("fictional-demo", "company-001")
+
+    assert result["fields"]["notes"] == "[REDACTED]"
+    assert result["fields"]["description"] == "Accidental provider echo: [REDACTED]."
+    assert result["fields"]["details"] == [{"text": "[REDACTED]"}]
+    assert credential not in json.dumps(result)
+    assert result["fields"]["name"] == "Fictional Acorn Studio"
+
+
+async def test_header_and_environment_reference_collisions_preserve_all_redaction(fixture_gateway, monkeypatch):
+    gateway, transport = fixture_gateway
+    stdio_value = "fictionalChildEnvironmentCredential"
+    credential = "fictionalHeaderCredential.29"
+    other_header_value = "fictionalOtherHeaderCredential"
+    other_header_variable = "SHERLOCK_TEST_OTHER_HEADER"
+    monkeypatch.setenv("SHERLOCK_TEST_STDIO_VALUE", stdio_value)
+    monkeypatch.setenv("SHERLOCK_TEST_HTTP_VALUE", f"Bearer {credential}")
+    monkeypatch.setenv(other_header_variable, other_header_value)
+    gateway.connections["fictional-demo"]["transport"].update({
+        "env_from": {"Authorization": "SHERLOCK_TEST_STDIO_VALUE"},
+        "headers_from_env": {"Authorization": "SHERLOCK_TEST_HTTP_VALUE", "X-Api-Key": other_header_variable},
+    })
+    transport.records["company-001"].update({
+        "child_echo": stdio_value,
+        "bare_echo": credential,
+        "full_echo": f"Bearer {credential}",
+        "other_echo": other_header_value,
+    })
+
+    result = await gateway.read_record("fictional-demo", "company-001")
+
+    for field in ("child_echo", "bare_echo", "full_echo", "other_echo"):
+        assert result["fields"][field] == "[REDACTED]"
+    assert not any(value in json.dumps(result) for value in (stdio_value, credential, other_header_value))
+
+
 async def test_upstream_errors_never_expose_error_body(fixture_gateway):
     gateway, transport = fixture_gateway
     original = transport.call_tool

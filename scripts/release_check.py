@@ -71,6 +71,11 @@ REQUIRED_FILES = frozenset({
     "public-facing/skills/sherlock-competitor-research/SKILL.md",
     "public-facing/skills/sherlock-case-files/SKILL.md",
     "public-facing/skills/sherlock-recall/SKILL.md",
+    "public-facing/skills/sherlock-dormant-relationships/SKILL.md",
+    "public-facing/skills/sherlock-pitched-contact-moves/SKILL.md",
+    "public-facing/runtime/src/agent_sherlock/relationships.py",
+    "public-facing/documentation/relationships.md",
+    "public-facing/documentation/examples/fictional-relationships.json",
     "public-facing/documentation/install.md", "public-facing/documentation/permissions.md",
     "public-facing/documentation/troubleshooting.md", "public-facing/documentation/compatibility.md",
 })

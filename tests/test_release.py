@@ -3,17 +3,22 @@
 from __future__ import annotations
 
 import hashlib
+from contextlib import contextmanager, redirect_stderr, redirect_stdout
+import io
+import json
 from pathlib import Path
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import zipfile
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
+import package_release as packaging
 from package_release import build_release, write_zip
-from release_check import check_git_history, check_tree, is_allowed
+from release_check import REQUIRED_FILES, check_git_history, check_tree, is_allowed
 
 
 class ReleaseTests(unittest.TestCase):
@@ -31,6 +36,40 @@ class ReleaseTests(unittest.TestCase):
 
     def rules(self, *, links: bool = True) -> set[str]:
         return {finding.rule for finding in check_tree(self.root, require_complete=False, links=links)}
+
+    def complete_fixture(self) -> None:
+        """Satisfy the current manifest without copying any real project data."""
+        for name in REQUIRED_FILES:
+            content = "{}\n" if name.endswith(".json") else "# Public test fixture\n"
+            self.write(name, content)
+
+    def output_paths(self, basename: str) -> dict[str, Path]:
+        output = Path(self.temp.name) / basename
+        return {"directory": output, "manifest": output.with_name(output.name + "-sha256.json"),
+                "zip": output.with_name(output.name + ".zip")}
+
+    def run_main(self, output: Path) -> int:
+        with redirect_stdout(io.StringIO()), redirect_stderr(io.StringIO()):
+            return packaging.main(["--source", str(self.root), "--output", str(output)])
+
+    def assert_absent(self, path: Path) -> None:
+        self.assertFalse(path.exists() or path.is_symlink(), str(path))
+
+    def seed_collision(self, path: Path, kind: str) -> tuple[Path, bytes]:
+        payload = b"Existing public test file; preserve unchanged.\n"
+        if kind == "file":
+            path.write_bytes(payload)
+            return path, payload
+        if kind == "directory":
+            path.mkdir()
+            sentinel = path / "unrelated.txt"
+            sentinel.write_bytes(payload)
+            return sentinel, payload
+        referent = path.with_name(path.name + "-referent")
+        if kind == "live-symlink":
+            referent.write_bytes(payload)
+        path.symlink_to(referent)
+        return referent, payload
 
     def test_allowlist_uses_canonical_runtime_and_skills(self) -> None:
         for name in ["public-facing/runtime/pyproject.toml", "public-facing/runtime/uv.lock",
@@ -173,6 +212,246 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(zip_one.read_bytes(), zip_two.read_bytes())
         with zipfile.ZipFile(zip_one) as archive:
             self.assertEqual(archive.namelist(), ["agent-sherlock/.gitignore", "agent-sherlock/README.md"])
+
+    def test_main_preserves_every_existing_output_kind(self) -> None:
+        self.complete_fixture()
+        for role in ("directory", "manifest", "zip"):
+            for kind in ("file", "directory", "live-symlink", "dangling-symlink"):
+                with self.subTest(role=role, kind=kind):
+                    paths = self.output_paths(f"existing-{role}-{kind}")
+                    collision = paths[role]
+                    referent, payload = self.seed_collision(collision, kind)
+                    before = collision.lstat()
+                    self.assertEqual(self.run_main(paths["directory"]), 1)
+                    after = collision.lstat()
+                    self.assertEqual((before.st_dev, before.st_ino, before.st_mode),
+                                     (after.st_dev, after.st_ino, after.st_mode))
+                    if kind == "dangling-symlink":
+                        self.assertTrue(collision.is_symlink())
+                        self.assert_absent(referent)
+                    else:
+                        self.assertEqual(referent.read_bytes(), payload)
+                    for other_role, other in paths.items():
+                        if other_role != role:
+                            self.assert_absent(other)
+
+    def test_main_rejects_racing_output_creation_after_preflight(self) -> None:
+        self.complete_fixture()
+        stage_release = packaging._staged_release
+        for role in ("directory", "manifest", "zip"):
+            for kind in ("file", "dangling-symlink"):
+                with self.subTest(role=role, kind=kind):
+                    paths = self.output_paths(f"racing-{role}-{kind}")
+                    collision = paths[role]
+                    seeded = []
+
+                    @contextmanager
+                    def raced_stage(*args, **kwargs):
+                        with stage_release(*args, **kwargs) as result:
+                            seeded.append(self.seed_collision(collision, kind))
+                            yield result
+
+                    with patch.object(packaging, "_staged_release", raced_stage):
+                        self.assertEqual(self.run_main(paths["directory"]), 1)
+                    referent, payload = seeded[0]
+                    if kind == "dangling-symlink":
+                        self.assertTrue(collision.is_symlink())
+                        self.assert_absent(referent)
+                    else:
+                        self.assertEqual(collision.read_bytes(), payload)
+                    for other_role, other in paths.items():
+                        if other_role != role:
+                            self.assert_absent(other)
+
+    def test_main_copy_failure_removes_owned_partial_outputs(self) -> None:
+        self.complete_fixture()
+        paths = self.output_paths("failed-copy")
+        sentinel = Path(self.temp.name) / "unrelated.txt"
+        sentinel.write_text("preserve", encoding="utf-8")
+        copy_staged = packaging._copy_staged
+        observed_reservation = []
+
+        def failed_copy(source, output, *args, **kwargs):
+            observed_reservation.append(all(path.exists() for path in paths.values()))
+            output.write(b"partial copied content")
+            raise OSError("Injected copy failure")
+
+        def fail_reserved_copy(staged, destination, created):
+            with patch.object(packaging.shutil, "copyfileobj", failed_copy):
+                copy_staged(staged, destination, created)
+
+        with patch.object(packaging, "_copy_staged", fail_reserved_copy):
+            self.assertEqual(self.run_main(paths["directory"]), 1)
+        self.assertEqual(observed_reservation, [True])
+        for path in paths.values():
+            self.assert_absent(path)
+        self.assertEqual(sentinel.read_text(), "preserve")
+
+    def test_main_manifest_failure_removes_owned_partial_outputs(self) -> None:
+        self.complete_fixture()
+        paths = self.output_paths("failed-manifest")
+        original_open = packaging._CreatedPaths.open
+
+        class FailedManifest:
+            def __init__(self, stream):
+                self.stream = stream
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                self.stream.close()
+
+            def write(self, value):
+                self.stream.write(value[:4])
+                raise OSError("Injected manifest failure")
+
+        def fail_manifest(created, path):
+            stream = original_open(created, path)
+            return FailedManifest(stream) if path == paths["manifest"] else stream
+
+        with patch.object(packaging._CreatedPaths, "open", fail_manifest):
+            self.assertEqual(self.run_main(paths["directory"]), 1)
+        for path in paths.values():
+            self.assert_absent(path)
+
+    def test_main_zip_failure_removes_owned_partial_outputs(self) -> None:
+        self.complete_fixture()
+        paths = self.output_paths("failed-zip")
+
+        def failed_zip(root, stream):
+            stream.write(b"partial archive")
+            raise OSError("Injected ZIP failure")
+
+        with patch.object(packaging, "write_zip", failed_zip):
+            self.assertEqual(self.run_main(paths["directory"]), 1)
+        for path in paths.values():
+            self.assert_absent(path)
+
+    def test_rollback_preserves_replaced_reserved_file(self) -> None:
+        self.complete_fixture()
+        paths = self.output_paths("replaced-manifest")
+        displaced = paths["manifest"].with_name("displaced-owned-manifest")
+        cleanup = packaging._CreatedPaths.cleanup
+
+        def replace_then_clean(created):
+            # Rollback runs after reserved handles close. Replacing here also
+            # exercises Windows, where an open file cannot be renamed.
+            # Keep the original inode alive so this deterministically tests
+            # replacement identity rather than filesystem inode reuse.
+            paths["manifest"].rename(displaced)
+            paths["manifest"].write_bytes(b"another process owns this")
+            cleanup(created)
+
+        with patch.object(packaging, "write_zip", side_effect=OSError("Injected ZIP failure")), \
+                patch.object(packaging._CreatedPaths, "cleanup", replace_then_clean):
+            self.assertEqual(self.run_main(paths["directory"]), 1)
+        self.assertEqual(paths["manifest"].read_bytes(), b"another process owns this")
+        self.assert_absent(paths["directory"])
+        self.assert_absent(paths["zip"])
+
+    def test_rollback_preserves_unrelated_child_in_reserved_directory(self) -> None:
+        self.complete_fixture()
+        paths = self.output_paths("unrelated-child")
+        copy_staged = packaging._copy_staged
+
+        def add_child_then_fail(staged, destination, created):
+            copy_staged(staged, destination, created)
+            (destination / "unrelated.txt").write_bytes(b"another process owns this")
+            raise OSError("Injected failure with unrelated child")
+
+        with patch.object(packaging, "_copy_staged", add_child_then_fail):
+            self.assertEqual(self.run_main(paths["directory"]), 1)
+        self.assertEqual(list(paths["directory"].iterdir()), [paths["directory"] / "unrelated.txt"])
+        self.assertEqual((paths["directory"] / "unrelated.txt").read_bytes(), b"another process owns this")
+        self.assert_absent(paths["manifest"])
+        self.assert_absent(paths["zip"])
+
+    def test_rollback_does_not_follow_replaced_directory_symlink(self) -> None:
+        self.complete_fixture()
+        paths = self.output_paths("replaced-directory")
+        displaced = Path(self.temp.name) / "displaced-owned-directory"
+        foreign = Path(self.temp.name) / "foreign-directory"
+        foreign.mkdir()
+        (foreign / "README.md").write_bytes(b"preserve foreign content")
+        copy_staged = packaging._copy_staged
+
+        def replace_then_fail(staged, destination, created):
+            copy_staged(staged, destination, created)
+            destination.rename(displaced)
+            destination.symlink_to(foreign, target_is_directory=True)
+            raise OSError("Injected failure after parent replacement")
+
+        with patch.object(packaging, "_copy_staged", replace_then_fail):
+            self.assertEqual(self.run_main(paths["directory"]), 1)
+        self.assertTrue(paths["directory"].is_symlink())
+        self.assertEqual((foreign / "README.md").read_bytes(), b"preserve foreign content")
+        self.assert_absent(paths["manifest"])
+        self.assert_absent(paths["zip"])
+
+    def test_direct_write_zip_rejects_existing_targets(self) -> None:
+        self.write("README.md", "# Public fixture\n")
+        for kind in ("file", "directory", "live-symlink", "dangling-symlink"):
+            with self.subTest(kind=kind):
+                target = Path(self.temp.name) / f"existing-{kind}.zip"
+                referent, payload = self.seed_collision(target, kind)
+                with self.assertRaises(OSError):
+                    write_zip(self.root, target)
+                if kind == "dangling-symlink":
+                    self.assertTrue(target.is_symlink())
+                    self.assert_absent(referent)
+                else:
+                    self.assertEqual(referent.read_bytes(), payload)
+
+    def test_direct_write_zip_failure_removes_partial_archive(self) -> None:
+        self.write("README.md", "# Public fixture\n")
+        target = Path(self.temp.name) / "failed-direct.zip"
+        with patch.object(packaging.zipfile.ZipFile, "writestr", side_effect=OSError("Injected ZIP write failure")):
+            with self.assertRaises(OSError):
+                write_zip(self.root, target)
+        self.assert_absent(target)
+
+    def test_direct_write_zip_string_and_pathlike_targets_are_exclusive(self) -> None:
+        self.write("README.md", "# Public fixture\n")
+
+        class ArchivePath:
+            def __init__(self, path):
+                self.path = path
+
+            def __fspath__(self):
+                return str(self.path)
+
+        for convert in (str, ArchivePath):
+            for kind in ("file", "dangling-symlink"):
+                with self.subTest(path_type=convert.__name__, kind=kind):
+                    target = Path(self.temp.name) / f"typed-{convert.__name__}-{kind}.zip"
+                    referent, payload = self.seed_collision(target, kind)
+                    with self.assertRaises(OSError):
+                        write_zip(self.root, convert(target))
+                    if kind == "dangling-symlink":
+                        self.assertTrue(target.is_symlink())
+                        self.assert_absent(referent)
+                    else:
+                        self.assertEqual(target.read_bytes(), payload)
+
+    def test_full_main_archives_and_manifests_are_reproducible(self) -> None:
+        self.complete_fixture()
+        first = self.output_paths("complete-one")
+        second = self.output_paths("complete-two")
+        self.assertEqual(self.run_main(first["directory"]), 0)
+        self.assertEqual(self.run_main(second["directory"]), 0)
+        self.assertEqual(first["zip"].read_bytes(), second["zip"].read_bytes())
+        self.assertEqual(first["manifest"].read_bytes(), second["manifest"].read_bytes())
+        manifest = json.loads(first["manifest"].read_text())
+        self.assertEqual(set(manifest), REQUIRED_FILES)
+        with zipfile.ZipFile(first["zip"]) as archive:
+            archived = {name.removeprefix("agent-sherlock/"): archive.read(name)
+                        for name in archive.namelist()}
+        self.assertEqual(set(archived), REQUIRED_FILES)
+        for name, data in archived.items():
+            self.assertEqual(manifest[name], hashlib.sha256(data).hexdigest())
+            self.assertEqual(data, (first["directory"] / name).read_bytes())
+            self.assertEqual(data, (self.root / name).read_bytes())
 
     def git(self, *arguments: str) -> None:
         subprocess.run(

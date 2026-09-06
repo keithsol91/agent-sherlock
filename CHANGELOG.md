@@ -1,9 +1,26 @@
 # Changelog
 
-## 0.1.0a1 — release candidate
+## 0.2.0a1 — 6 September 2026
 
-First installable public-edition candidate. Public release and its final code
-license remain subject to owner approval; see [release verification](docs/RELEASE.md).
+- Added dormant pitch relationships and pitched-contact employer moves as two portable skills.
+- Added deterministic, paginated, profile-local imports and owner reviews with source coverage,
+  revisions, retained original pitch history, local exclusions, and feedback.
+- Added schema-1-to-2 migration and fictional runtime/protocol coverage.
+- Bundled the new skills' guides and fictional examples so copied skill folders are self-contained.
+- Redacted bare Bearer credentials from provider results and rejected them in proposed change inputs.
+- Prevented the release builder from overwriting existing directories, manifests, ZIPs, or symlink targets; failures clean up only outputs created by that run.
+- Clarified that a chosen host and model provider may process relationship data returned through MCP.
+- Host collection, provider validation, optional scheduling, and external delivery remain separate.
+
+Back up with the previous runtime and stop its profile service before upgrading.
+Schema 2 requires a pre-upgrade backup and the matching older runtime for rollback.
+See [relationship storage and upgrades](public-facing/documentation/relationships.md#storage-and-upgrades).
+
+
+## 0.1.0a1 — 6 September 2026
+
+First installable public preview, published with owner approval under MIT for
+original code and skills; see [release verification](docs/RELEASE.md).
 
 - Added a local stdio MCP service with profile-scoped case storage, evidence,
   sourced findings, correction history, research coverage, and structured recall.

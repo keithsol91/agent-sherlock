@@ -34,6 +34,8 @@ Continue with [daily workflows](documentation/daily-recipes.md) and the
 | [Account context](skills/sherlock-account-context/SKILL.md) | Resolve the CRM record and manage proposed changes through the controlled workflow. |
 | [Case files](skills/sherlock-case-files/SKILL.md) | Preserve evidence, corrections, and the history of an investigation. |
 | [Recall](skills/sherlock-recall/SKILL.md) | Retrieve prior findings with sources, dates, and coverage limitations. |
+| [Dormant relationships](skills/sherlock-dormant-relationships/SKILL.md) | Review actual pitched contacts still at the same employer after scoped contact dormancy. |
+| [Pitched contact moves](skills/sherlock-pitched-contact-moves/SKILL.md) | Review actual pitched contacts verified at a new employer. |
 
 Load skills using your agent host's supported installation method. Skills are
 instructions; installing them alone does not install the MCP service or connect

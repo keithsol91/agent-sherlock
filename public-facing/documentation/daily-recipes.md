@@ -1,6 +1,6 @@
 # Use Sherlock during the workday
 
-Ask your existing agent to use the `agent-sherlock` skill, or select one of its four workflow skills. Your host supplies reasoning and any available research tools. Sherlock maintains the selected profile's cases and evidence. Tool names below are the server's names; hosts may add prefixes.
+Ask your existing agent to use the `agent-sherlock` skill, or select one of its six workflow skills. Your host supplies reasoning and any available research tools. Sherlock maintains the selected profile's cases and evidence. Tool names below are the server's names; hosts may add prefixes.
 
 ## Investigate a competitor
 
@@ -41,6 +41,15 @@ Each installer must connect their own Slack workspace/account and app or connect
 Bind the verified workspace and app/bot identity, allowed channels and senders, and intended Sherlock profile before routing requests to its skills. The host controls Slack access and reply routing; Sherlock's profile selects the local case store. Do not point mutually untrusted Slack users at a single trusted profile and assume channel visibility will enforce case access.
 
 Use a fictional test case and an authorized test channel to verify recall and delivery separately. Read the authorized reply back in the intended workspace/channel/thread before claiming Slack delivery works. The existing website's Slack conversations are authored demonstrations, not successful installation tests for your workspace.
+
+## Review past pitch relationships
+
+> Use Sherlock to review our imported pitch relationships. Show people still at the same company after at least 24 months since the latest meaningful conversation found in the configured sources, and people now verified at a different company. Preserve original pitch context, disclose missing coverage, and give me a local review queue.
+
+Use [the relationship guide](relationships.md) for the portable import, evidence rules,
+paginated evaluation, owner feedback, and optional host scheduling. These workflows
+require an actual pitch relationship. They do not require a news trigger, creative
+idea, or a two-year wait for a verified employer move.
 
 ## Export and protect your records
 

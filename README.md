@@ -8,8 +8,8 @@
 prepare account briefs, keep living case files, and recall the evidence your
 next conversation needs.
 
-Sherlock is five portable skills plus a local MCP service. Your agent does the
-research and reasoning. Sherlock keeps the sources, findings, history, and
+Sherlock is seven portable skills plus a local MCP service. Your agent does the
+research and reasoning. Sherlock keeps the sources, findings, history, relationship reviews, and
 controlled CRM changes organized in your own profile.
 
 [Get started](#try-sherlock) · [Install in your agent](public-facing/documentation/install.md)
@@ -17,7 +17,7 @@ controlled CRM changes organized in your own profile.
 · [Compatibility](public-facing/documentation/compatibility.md)
 · [Contribute](CONTRIBUTING.md)
 
-> **Early preview · 0.1.0a1.** Start with the fictional demo, then connect your
+> **Early preview · 0.2.0a1.** Start with the fictional demo, then connect your
 > chosen agent. Named agent and CRM connections have individual verification
 > states in the compatibility guide. A passing demo does not certify a live
 > CRM connection, delivered Slack message, or every host.
@@ -64,7 +64,7 @@ Open this checkout in your local agent and paste:
 ```text
 Set up Agent Sherlock from this checkout. Read README.md and
 public-facing/documentation/install.md, compatibility.md, and permissions.md.
-Run the locked setup, doctor, and fictional demo. Install all five public-facing
+Run the locked setup, doctor, and fictional demo. Install all seven public-facing
 skill folders and register this checkout's local stdio MCP service with this
 host, preserving unrelated configuration. Use an explicit private data directory
 and profile. Verify tool discovery and a fictional case save/read/recall across
@@ -90,6 +90,17 @@ Host-specific instructions and actual test coverage are in the
 Research separates organic activity, audience conversations, and visible paid
 creative. Public engagement does not reveal private spend, targeting, revenue,
 or return on ad spend. Findings retain their sources and observation dates.
+
+## Review the relationships you have already built
+
+The [relationship workflows](public-facing/documentation/relationships.md) add two
+local reviews: actual pitched contacts still at the same employer after at least
+24 months since the latest meaningful conversation found, and actual pitched
+contacts verified at a different employer without a two-year waiting rule.
+Import all authorized historical relationships and keep adding new ones. The
+runtime preserves original pitch context, source coverage, corrections, and a
+deduplicated owner queue. It does not collect from Sales Navigator, send outreach,
+or enable a schedule; your host supplies configured sources and optional recurrence.
 
 ## Your tools. Your records. Your decisions.
 
@@ -120,7 +131,7 @@ steps, and [third-party notices](THIRD_PARTY_NOTICES.md) for artwork and marks.
 
 | Path | Purpose |
 | --- | --- |
-| [public-facing/skills](public-facing/skills/) | The router skill and four workflow skills |
+| [public-facing/skills](public-facing/skills/) | The router skill and six workflow skills |
 | [public-facing/runtime](public-facing/runtime/) | Python MCP service, pinned dependency lock, and runtime tests |
 | [public-facing/documentation](public-facing/documentation/) | Installation, daily use, permissions, compatibility, and troubleshooting |
 | [public-facing](public-facing/) | Static product website and fictional examples |

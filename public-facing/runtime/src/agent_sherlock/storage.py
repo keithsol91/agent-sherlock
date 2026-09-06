@@ -25,7 +25,7 @@ SOURCE_STATES = ("observed", "partial", "unavailable", "restricted", "failed", "
 CASE_TYPES = ("account", "client", "lead", "competitor", "research")
 FINDING_KINDS = ("observed", "inferred", "user_supplied")
 MAX_CONTENT_LENGTH = 12_000
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 
 class StoreError(Exception):
@@ -214,10 +214,13 @@ class Store:
             self._conn.execute("PRAGMA secure_delete=ON")
             self._conn.execute("PRAGMA journal_mode=WAL")
             version = self._conn.execute("PRAGMA user_version").fetchone()[0]
-            if version not in (0, SCHEMA_VERSION):
+            if version not in (0, 1, SCHEMA_VERSION):
                 raise StoreError("Database schema is newer or unsupported; use a compatible Sherlock release")
-            self._conn.executescript(_SCHEMA)
-            self._conn.execute(f"PRAGMA user_version={SCHEMA_VERSION}")
+            from .relationships import SCHEMA as RELATIONSHIP_SCHEMA
+            # Version 1 adds no data transform: create the new related tables in
+            # one transaction, preserving every existing case and its revision.
+            self._conn.executescript("BEGIN IMMEDIATE;\n" + _SCHEMA + RELATIONSHIP_SCHEMA
+                                     + f"\nPRAGMA user_version={SCHEMA_VERSION};\nCOMMIT;")
         except Exception:
             self._conn.close()
             raise
@@ -276,6 +279,10 @@ class Store:
             "SELECT * FROM evidence WHERE profile=? AND case_id=? ORDER BY created_at,id", (self.profile, case_id))]
         result["findings"] = [self._finding(row) for row in self._conn.execute(
             "SELECT * FROM findings WHERE profile=? AND case_id=? ORDER BY created_at,id", (self.profile, case_id))]
+        relationship = self._conn.execute("SELECT id,revision,record_json,local_state FROM relationships WHERE profile=? AND case_id=?", (self.profile, case_id)).fetchone()
+        if relationship:
+            result["relationship"] = {"id": relationship["id"], "revision": relationship["revision"],
+                                      "record": json.loads(relationship["record_json"]), "local_state": json.loads(relationship["local_state"])}
         result["source_counts"] = {state: sum(item["source_state"] == state for item in result["evidence"]) for state in SOURCE_STATES}
         result["collection_status"] = self._collection_status(result["source_counts"])
         return result
@@ -437,7 +444,10 @@ class Store:
     def export_profile(self) -> dict[str, Any]:
         with self._transaction():
             ids = [row[0] for row in self._conn.execute("SELECT id FROM cases WHERE profile=? ORDER BY created_at,id", (self.profile,))]
-            return {"schema_version": SCHEMA_VERSION, "profile": self.profile, "exported_at": _now(), "cases": [self._get_case(case_id) for case_id in ids]}
+            result = {"schema_version": SCHEMA_VERSION, "profile": self.profile, "exported_at": _now(), "cases": [self._get_case(case_id) for case_id in ids]}
+            for table in ("relationships", "relationship_history", "relationship_reviews", "relationship_review_events"):
+                result[table] = [dict(row) for row in self._conn.execute(f"SELECT * FROM {table} WHERE profile=? ORDER BY rowid", (self.profile,))]
+            return result
 
     def backup(self, destination: str | Path) -> Path:
         """Create a new SQLite backup containing only this profile.

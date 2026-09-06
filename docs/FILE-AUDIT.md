@@ -5,7 +5,7 @@ Sherlock's public package is assembled from an explicit manifest in
 actual staged files before producing an archive. New files outside the listed
 categories are excluded until the manifest changes.
 
-The release surface is the MCP runtime, five Markdown skills, installation and
+The release surface is the MCP runtime, seven Markdown skills, installation and
 workflow documentation, and the supporting website and design sources. The
 runtime installs from its local checkout. Provider connections and host-agent
 compatibility have their own configuration and verification boundaries; the

@@ -74,7 +74,7 @@ and permissions.md in its documentation folder.
 Use a private data directory outside the checkout.
 Run doctor and the fictional no-provider demo.
 Register its local stdio MCP service with this host
-and install all five skills using this host's
+and install all seven skills using this host's
 supported method. Preserve unrelated settings
 and existing skill files; show conflicts first.
 Verify tool discovery and case save/read/recall
@@ -90,14 +90,17 @@ provider, enable autosave, or publish anything.</code></pre>
           </section>
           <section id="availability" aria-labelledby="availability-title">
             <h2 id="availability-title">What is in the alpha?</h2>
-            <p>The source bundle includes five skill files and a local Python MCP service. The skills guide the work; the service supplies persistent case evidence, recall, and controlled CRM workflows. Read the setup guide for the current command and tool contracts.</p>
+            <p>The source bundle includes seven skill files and a local Python MCP service. The skills guide the work; the service supplies persistent case evidence, recall, and controlled CRM workflows. Read the setup guide for the current command and tool contracts.</p>
             <ul>
               <li><a class="sherlock-link" href="skills/agent-sherlock/SKILL.md">Agent Sherlock</a> chooses the appropriate workflow and establishes evidence and permission rules.</li>
               <li><a class="sherlock-link" href="skills/sherlock-competitor-research/SKILL.md">Competitor research</a> turns available public sources into a dated, sourced brief.</li>
               <li><a class="sherlock-link" href="skills/sherlock-account-context/SKILL.md">Account context</a> matches records and manages proposed CRM changes.</li>
               <li><a class="sherlock-link" href="skills/sherlock-case-files/SKILL.md">Case files</a> preserves evidence, corrections, and investigation history.</li>
               <li><a class="sherlock-link" href="skills/sherlock-recall/SKILL.md">Recall</a> retrieves prior evidence for an answer or another agent.</li>
+              <li><a class="sherlock-link" href="skills/sherlock-dormant-relationships/SKILL.md">Dormant relationships</a> reviews actual pitched contacts still at the same company after scoped contact dormancy.</li>
+              <li><a class="sherlock-link" href="skills/sherlock-pitched-contact-moves/SKILL.md">Pitched contact moves</a> reviews actual pitched contacts verified at a new employer.</li>
             </ul>
+            <p>The <a class="sherlock-link" href="documentation/relationships.md">relationship guide</a> covers portable imports, local owner feedback, and explicitly enabled host schedules. Sherlock does not collect Sales Navigator data or send outreach.</p>
             <p>Live provider connections are optional and must be configured separately. A configured connector is not evidence that authentication, permissions, or a real read-and-write workflow has passed. The <a class="sherlock-link" href="#compatibility">compatibility notes</a> explain that boundary.</p>
           </section>
           <section id="slack" aria-labelledby="slack-docs-title">

@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "relationships": [
+    {
+      "id": "fictional-person:fictional-acorn",
+      "fictional": true,
+      "person": {
+        "id": "fictional-person",
+        "name": "Fictional Alex Reed",
+        "linkedin_url": "https://social.example/in/fictional-alex"
+      },
+      "original_company": {
+        "id": "fictional-acorn",
+        "name": "Fictional Acorn",
+        "domain": "acorn.example",
+        "verified": true
+      },
+      "owner": {
+        "id": "fictional-owner",
+        "name": "Fictional Owner"
+      },
+      "pitch_verified": true,
+      "pitch_evidence": [
+        {
+          "source": "crm://fictional/meetings/1",
+          "occurred_at": "2023-08-01T12:00:00Z",
+          "kind": "pitch_meeting"
+        }
+      ],
+      "last_meaningful_contact_at": "2024-09-06T12:00:00Z",
+      "last_contact_source": "crm://fictional/emails/1",
+      "history_coverage": {
+        "status": "complete",
+        "scope": "Fictional CRM logged communications",
+        "exhaustive": false,
+        "checked_at": "2026-09-06T12:00:00Z"
+      },
+      "current_employment": {
+        "company_id": "fictional-acorn",
+        "company_name": "Fictional Acorn",
+        "company_domain": "acorn.example",
+        "title": "Marketing Director",
+        "profile_url": "https://social.example/in/fictional-alex",
+        "observed_at": "2026-09-06T12:00:00Z",
+        "identity_verified": true,
+        "ambiguous": false,
+        "positions": [
+          {
+            "company_id": "fictional-acorn"
+          }
+        ]
+      },
+      "source_status": {
+        "company_id": "fictional-acorn",
+        "open_deal": false,
+        "active_client": false,
+        "do_not_contact": false,
+        "enrichment_opt_out": false,
+        "recent_outreach_at": null,
+        "verified_at": "2026-09-06T12:00:00Z"
+      },
+      "deal_status": "lost"
+    }
+  ]
+}

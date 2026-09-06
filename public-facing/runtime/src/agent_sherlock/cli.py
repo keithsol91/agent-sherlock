@@ -39,6 +39,24 @@ def parser() -> argparse.ArgumentParser:
     template.add_argument("--properties", required=True, help="Comma-separated explicit company fields to read and permit in proposals.")
     template.add_argument("--account-id-path", required=True, help="Verified dotted account ID path from the provider response.")
     template.add_argument("--output", required=True, help="New private JSON config path; never overwrite an existing config.")
+    rel = sub.add_parser("relationship-import", help="Atomically import a portable JSON batch into this profile; no provider calls.")
+    rel.add_argument("source", help="Private JSON file with schema_version=1 and a relationships array (maximum 100).")
+    for name in ("relationship-list", "relationship-evaluate", "relationship-queue"):
+        rel = sub.add_parser(name)
+        rel.add_argument("--limit", type=int, default=100)
+        rel.add_argument("--after-id")
+        if name == "relationship-queue":
+            rel.add_argument("--state", default="ready", help="Review state or all.")
+    rel = sub.add_parser("relationship-get")
+    rel.add_argument("relationship_id")
+    rel.add_argument("--history", action="store_true")
+    rel = sub.add_parser("relationship-feedback")
+    rel.add_argument("review_id")
+    rel.add_argument("action")
+    rel.add_argument("--expected-revision", type=int, required=True)
+    rel.add_argument("--note", default="")
+    rel.add_argument("--until")
+    rel.add_argument("--clear-hold", action="append", dest="clear_holds", help="Explicit person hold to clear with reopen; repeat to name multiple holds.")
     delete = sub.add_parser("delete-case")
     delete.add_argument("case_id")
     delete.add_argument("--confirm", required=True, help="Repeat exact case ID; backups are not deleted.")
@@ -112,6 +130,33 @@ def main(argv: list[str] | None = None) -> int:
                 output({"state": "unchanged", "reason": "No approval or rejection recorded."})
             return 0
         from .storage import Store
+        if args.command.startswith("relationship-"):
+            from .operations import service_lock
+            from .relationships import Relationships
+            # Host calls should use the running MCP service. Standalone CLI
+            # operations acquire the same profile lock before opening storage.
+            with service_lock(settings), Store(settings.database, profile=settings.profile) as store:
+                relationships = Relationships(store, settings.config.get("relationship_policy"))
+                if args.command == "relationship-import":
+                    source = Path(args.source).expanduser()
+                    if source.stat().st_size > 2_000_000:
+                        raise ValueError("Relationship import exceeds the 2 MB batch limit.")
+                    payload = json.loads(source.read_text(encoding="utf-8"))
+                    if not isinstance(payload, dict) or payload.get("schema_version") != 1:
+                        raise ValueError("Use portable relationship schema_version 1.")
+                    result = relationships.import_records(payload.get("relationships"))
+                elif args.command == "relationship-list":
+                    result = relationships.list(limit=args.limit, after_id=args.after_id)
+                elif args.command == "relationship-get":
+                    result = relationships.get(args.relationship_id, include_history=args.history)
+                elif args.command == "relationship-evaluate":
+                    result = relationships.evaluate_all(limit=args.limit, after_id=args.after_id)
+                elif args.command == "relationship-queue":
+                    result = relationships.queue(state=None if args.state == "all" else args.state, limit=args.limit, after_id=args.after_id)
+                else:
+                    result = relationships.feedback(args.review_id, args.action, expected_revision=args.expected_revision, note=args.note, until=args.until, clear_holds=args.clear_holds)
+                output(result)
+            return 0
         with Store(settings.database, profile=settings.profile) as store:
             if args.command == "doctor":
                 output({"version": __version__, "profile": settings.profile,

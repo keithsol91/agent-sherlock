@@ -39,3 +39,12 @@ For a custom CRM gateway, validate the actual search/read/write tools, request a
 Capture the Sherlock commit/version, host/version, OS/runtime, profile alias, adapter/tool schema version, tested operations, fixture versus live status, result, and remaining limitations. Use aliases for external test accounts. Omit secrets and private payloads from shared evidence. A successful pilot should also exercise token expiry, missing permissions, uncertain writes, restart, correction, and deletion/recall behavior.
 
 These guides intentionally avoid a blanket “works with every agent/CRM” claim. Use the [install guide](install.md) to reproduce the relevant local path, then promote its label only after the matching evidence exists.
+
+## Relationship review extension
+
+The portable relationship import, deterministic rules, local review queue, and owner feedback
+are a local development extension. Existing host/provider results above describe their
+original scopes and do not certify these new workflows. The repository's fictional runtime
+and protocol tests cover the extension separately. There is no supplied Sales Navigator
+connector, CRM communication-history collector, or built-in scheduler. See the
+[relationship guide](relationships.md) for required inputs and host boundaries.

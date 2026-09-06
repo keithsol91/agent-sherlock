@@ -6,7 +6,7 @@ from contextlib import closing
 import pytest
 
 from agent_sherlock.changes import ChangeError, ChangeManager
-from agent_sherlock.connectors import ConnectorGateway, FixtureTransport, fixture_connection_config
+from agent_sherlock.connectors import ConnectorError, ConnectorGateway, FixtureTransport, fixture_connection_config
 
 
 EVIDENCE = [{"source_url": "https://example.com/fictional", "observation": "Fictional example evidence", "observed_at": "2026-09-06"}]
@@ -224,6 +224,38 @@ async def test_noop_and_secret_payloads_are_rejected(setup):
     with pytest.raises(ChangeError):
         await manager.propose("fictional-demo", "company-001", {"industry": "Other"}, [{"source": "Bearer dont-store-this"}])
     assert not writes(transport)
+
+
+@pytest.mark.parametrize("header, header_value", [
+    ("Authorization", "Bearer {credential}"),
+    ("authorization", "bearer {credential}"),
+    ("AUTHORIZATION", "\tBEARER\t{credential}\t"),
+    ("Proxy-Authorization", "Bearer {credential}"),
+    ("pRoXy-AuThOrIzAtIoN", "  bEaReR \t {credential}  "),
+])
+@pytest.mark.parametrize("location", ["fields", "evidence"])
+async def test_bare_bearer_credential_cannot_enter_proposal_storage(setup, monkeypatch, header, header_value, location):
+    manager, gateway, transport = setup
+    credential = "fictionalProposalCredential.53+/=="
+    monkeypatch.setenv("SHERLOCK_TEST_PROPOSAL_HEADER", header_value.format(credential=credential))
+    gateway.connections["fictional-demo"]["transport"]["headers_from_env"] = {header: "SHERLOCK_TEST_PROPOSAL_HEADER"}
+    fields = {"research_summary": "A sourced fictional finding."}
+    evidence = EVIDENCE
+    if location == "fields":
+        fields["research_summary"] = f"Accidental copied value: {credential}"
+    else:
+        evidence = [{"source_url": "https://example.com/fictional", "observation": {"copied_value": credential}}]
+
+    with pytest.raises((ChangeError, ConnectorError)) as error:
+        await manager.propose("fictional-demo", "company-001", fields, evidence)
+
+    assert error.value.code == "sensitive_payload"
+    assert credential not in str(error.value)
+    assert not writes(transport)
+    assert manager.list_pending() == []
+    with closing(sqlite3.connect(manager.db_path)) as db, db:
+        assert db.execute("SELECT COUNT(*) FROM sherlock_changes").fetchone()[0] == 0
+    assert credential.encode() not in manager.db_path.read_bytes()
 
 
 async def test_readback_failure_is_unknown_and_recovery_is_read_only(setup):

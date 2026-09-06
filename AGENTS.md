@@ -13,7 +13,7 @@ This directory is the standalone public product project for Agent Sherlock. It i
 ## Product and release checks
 
 - `public-facing/runtime/` is the local Python MCP service. It is started by an agent host over stdio, not as a public web server.
-- `public-facing/skills/` contains the canonical five operating skills. `public-facing/documentation/` contains user setup and daily workflows.
+- `public-facing/skills/` contains the canonical seven operating skills. `public-facing/documentation/` contains user setup and daily workflows.
 - Preserve profile isolation, evidence provenance, revision checks, operator approval, and destination readback when changing persistence or CRM behavior.
 - Run runtime checks with `uv run --locked --project public-facing/runtime pytest public-facing/runtime/tests` and packaging checks with `python3 -m unittest discover -s tests -v`.
 - Public distributions are built by `scripts/package_release.py`; review the exact resulting tree using `scripts/release_check.py`. Do not publish the workspace wholesale or include local `.vercel`, environments, data, backups, or QA artifacts.

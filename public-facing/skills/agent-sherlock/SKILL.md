@@ -13,6 +13,8 @@ Choose the workflow that matches the user's task:
 - `sherlock-account-context`: match a CRM account, research it, and propose or apply a permitted update.
 - `sherlock-case-files`: preserve evidence, corrections, and investigation history.
 - `sherlock-recall`: retrieve prior evidence for an answer or another agent.
+- `sherlock-dormant-relationships`: review actually pitched people still at the same company after at least 24 months of scoped contact dormancy.
+- `sherlock-pitched-contact-moves`: review actually pitched people now verified at a different company, without a two-year wait.
 
 Load the matching installed skill by name. When reading from this source bundle, its `SKILL.md` is in the sibling directory of that name. If it is unavailable, use the rules below and report the missing workflow rather than inventing tool behavior.
 

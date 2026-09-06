@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "relationships": [
+    {
+      "id": "fictional-second-person:fictional-acorn",
+      "fictional": true,
+      "person": {
+        "id": "fictional-second-person",
+        "name": "Fictional Sam Lane",
+        "linkedin_url": "https://social.example/in/fictional-sam"
+      },
+      "original_company": {
+        "id": "fictional-acorn",
+        "name": "Fictional Acorn",
+        "domain": "acorn.example",
+        "verified": true
+      },
+      "owner": {
+        "id": "fictional-owner",
+        "name": "Fictional Owner"
+      },
+      "pitch_verified": true,
+      "pitch_evidence": [
+        {
+          "source": "crm://fictional/meetings/1",
+          "occurred_at": "2023-08-01T12:00:00Z",
+          "kind": "pitch_meeting"
+        }
+      ],
+      "last_meaningful_contact_at": "2026-06-01T12:00:00Z",
+      "last_contact_source": "crm://fictional/emails/1",
+      "history_coverage": {
+        "status": "complete",
+        "scope": "Fictional CRM logged communications",
+        "exhaustive": false,
+        "checked_at": "2026-09-06T12:00:00Z"
+      },
+      "current_employment": {
+        "company_id": "fictional-birch",
+        "company_name": "Fictional Birch",
+        "company_domain": "birch.example",
+        "title": "Marketing Director",
+        "profile_url": "https://social.example/in/fictional-sam",
+        "observed_at": "2026-09-06T12:00:00Z",
+        "identity_verified": true,
+        "ambiguous": false,
+        "positions": [
+          {
+            "company_id": "fictional-birch"
+          }
+        ]
+      },
+      "source_status": {
+        "company_id": "fictional-birch",
+        "open_deal": false,
+        "active_client": false,
+        "do_not_contact": false,
+        "enrichment_opt_out": false,
+        "recent_outreach_at": null,
+        "verified_at": "2026-09-06T12:00:00Z"
+      },
+      "deal_status": "lost"
+    }
+  ]
+}

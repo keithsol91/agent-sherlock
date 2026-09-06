@@ -15,7 +15,7 @@ A doctor result describes local setup. It is not a test of every provider creden
 | Startup dependency or Python error | Verify Python 3.11+ and run the checkout's frozen dependency sync. Review the actual install error rather than adding unknown provider keys. |
 | `serve` waits without a web page | This is expected for stdio. The MCP host starts the process and sends protocol requests. There is no HTTP/browser UI in that command. |
 | Host reports no Sherlock tools | Verify the launcher, profile/config selection, host stderr, then restart/reload that host. Inspect tool discovery; do not confuse a skill appearing with an MCP connection working. |
-| Skill missing | Copy all five complete skill directories into the chosen host's supported skills location; check for a same-name collision and start a fresh session. |
+| Skill missing | Copy all seven complete skill directories into the chosen host's supported skills location; check for a same-name collision and start a fresh session. |
 | Cases disappear between sessions | Compare the actual data directory and profile. The demo uses a separate profile. A new working directory should not require a new store when absolute startup settings are used. |
 | Profile service is already running | This build allows one Sherlock server process per profile. Stop that process before another host starts the same profile or before backup/restore. This is not a shared multi-host daemon. |
 | Configuration profile mismatch | Select the matching profile or correct the operator-owned config. MCP tool input cannot switch the process profile. |
@@ -44,7 +44,7 @@ Point the host at the recovery data directory, restart it, and verify the recove
 
 Before changing a working checkout, record its version and back up the data profile. Stop its MCP process, review the new version's migration/release notes, sync the new locked dependencies, run doctor and the fictional demo, and restart the host. Verify a representative existing case. Do not assume a previous binary can safely read a newer database schema; use the documented restore path with the matching version for a rollback.
 
-To remove Sherlock, remove only its named MCP registration and its five installed skill folders from the selected host, then restart it. Decide separately whether to keep or delete local data, exports, and backups. Revoke optional external provider credentials through their own account controls when appropriate.
+To remove Sherlock, remove only its named MCP registration and its seven installed skill folders from the selected host, then restart it. Decide separately whether to keep or delete local data, exports, and backups. Revoke optional external provider credentials through their own account controls when appropriate.
 
 ## Report a reproducible problem
 

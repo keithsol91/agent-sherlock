@@ -47,3 +47,11 @@ Database compatibility must be verified for each release; do not assume an older
 The profile binding prevents an MCP caller from requesting another profile through Sherlock's tool arguments. It is not an operating-system security boundary against a host with unrestricted shell/filesystem access. Do not share one profile across mutually untrusted users or expose stdio through an unauthenticated remote bridge.
 
 Retain a minimal record of version, host, profile alias, operation, tool status, and reproducible fixture steps when investigating failures. Do not attach case databases, CRM payloads, credentials, authentication links, or private environment files to public issues. See [troubleshooting.md](troubleshooting.md#report-a-reproducible-problem).
+
+## Relationship reviews and schema 2
+
+The relationship runtime uses the existing cases database with an atomic schema-1-to-2 upgrade.
+Back up before upgrade; an older binary requires its pre-upgrade backup for rollback.
+The new standalone `relationship-*` commands acquire the profile service lock.
+If the MCP host is already running this profile, use the host's relationship tools
+instead of starting a competing scheduled CLI process. See [relationship operations](relationships.md).

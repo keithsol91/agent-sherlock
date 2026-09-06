@@ -38,6 +38,8 @@ def build_server(settings: Settings, gateway=None) -> MCPServer:
     from .changes import ChangeManager
 
     store = Store(settings.database, profile=settings.profile)
+    from .relationships import Relationships
+    relationships = Relationships(store, settings.config.get("relationship_policy"))
     gateway = gateway or ConnectorGateway(settings.config)
     changes = ChangeManager(settings.changes_database, gateway, policy=settings.config.get("policy"))
 
@@ -216,5 +218,42 @@ def build_server(settings: Settings, gateway=None) -> MCPServer:
     async def change_reconcile(proposal_id: str) -> dict:
         """Read back an interrupted or uncertain CRM change without attempting another write."""
         return await changes.reconcile(proposal_id)
+
+    @tool()
+    @guarded
+    async def relationship_import(records: list[dict]) -> dict:
+        """Import 1-100 portable relationship entries locally and atomically. Updates need expected_revision and reason. No provider calls."""
+        return relationships.import_records(records)
+
+    @tool(read_only=True)
+    @guarded
+    async def relationship_get(relationship_id: str, include_history: bool = False) -> dict:
+        """Read the original pitch relationship, observations, revision, local opt-outs, and optional prior snapshots."""
+        return relationships.get(relationship_id, include_history=include_history)
+
+    @tool(read_only=True)
+    @guarded
+    async def relationship_list(limit: int = 100, after_id: str | None = None) -> dict:
+        """Page all imported relationships; no age cutoff. Check opt-outs before host enrichment."""
+        return relationships.list(limit=limit, after_id=after_id)
+
+    @tool()
+    @guarded
+    async def relationship_evaluate(limit: int = 100, after_id: str | None = None) -> dict:
+        """Evaluate a page using the current clock and operator policy; maintain a deduplicated local queue. Does not send or schedule."""
+        return relationships.evaluate_all(limit=limit, after_id=after_id)
+
+    @tool(read_only=True)
+    @guarded
+    async def relationship_queue(state: str | None = "ready", limit: int = 100, after_id: str | None = None) -> dict:
+        """Read local relationship reviews with source coverage, evidence and revisions; delivery is separate."""
+        return relationships.queue(state=state, limit=limit, after_id=after_id)
+
+    @tool()
+    @guarded
+    async def relationship_feedback(review_id: str, action: str, expected_revision: int,
+                                    note: str = "", until: str | None = None, clear_holds: list[str] | None = None) -> dict:
+        """Record owner review feedback locally. Reopen clears only explicitly named clear_holds. Reconnect records intent only; it neither sends outreach nor approves a CRM change."""
+        return relationships.feedback(review_id, action, expected_revision=expected_revision, note=note, until=until, clear_holds=clear_holds)
 
     return server

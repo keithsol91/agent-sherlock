@@ -1,6 +1,6 @@
 # Install Agent Sherlock from this checkout
 
-Sherlock is a Python MCP service plus five portable instruction skills. Your existing agent supplies the model, research tools, and optional connected services. This preview is installed from the [GitHub source repository](https://github.com/keithsol91/agent-sherlock). Read the [compatibility status](compatibility.md) before choosing a host.
+Sherlock is a Python MCP service plus seven portable instruction skills. Your existing agent supplies the model, research tools, and optional connected services. This preview is installed from the [GitHub source repository](https://github.com/keithsol91/agent-sherlock). Read the [compatibility status](compatibility.md) before choosing a host.
 
 Each installer connects their own Slack workspace/account using their own app installation and credentials. Installing Sherlock does not connect Slack automatically or supply the author's workspace, app, credentials, or history. The current path uses the installer's selected host to handle Slack; see [Slack setup](slack.md).
 
@@ -32,7 +32,7 @@ Read documentation/install.md, documentation/compatibility.md,
 documentation/permissions.md, and documentation/slack.md. Inspect the package's help and configuration
 example. Use a private data directory outside the source checkout. Run doctor
 and the fictional no-provider demo, then register the local stdio MCP server
-with this host and install all five folders from skills/ in its supported
+with this host and install all seven folders from skills/ in its supported
 skills directory. Preserve unrelated host settings and existing skill files;
 show me conflicts before replacing them. Use the same selected profile for
 the host and CLI. Verify tool discovery and case save/read/recall in a test
@@ -62,7 +62,7 @@ From the working project where you want Sherlock available, with the variables a
 claude mcp add --transport stdio --scope local agent-sherlock -- uv run --locked --project "$SHERLOCK_ROOT/runtime" sherlock --data-dir "$SHERLOCK_DATA" --profile personal serve
 ```
 
-Open a new Claude Code session and check `/mcp`. The `local` scope ties this registration to the current project. Copy the five skill directories into that project's `.claude/skills/`, preserving any existing folders with the same name. [Claude Code MCP](https://code.claude.com/docs/en/mcp) and [skills](https://code.claude.com/docs/en/skills).
+Open a new Claude Code session and check `/mcp`. The `local` scope ties this registration to the current project. Copy the seven skill directories into that project's `.claude/skills/`, preserving any existing folders with the same name. [Claude Code MCP](https://code.claude.com/docs/en/mcp) and [skills](https://code.claude.com/docs/en/skills).
 
 ### Codex
 
@@ -70,7 +70,7 @@ Open a new Claude Code session and check `/mcp`. The `local` scope ties this reg
 codex mcp add agent-sherlock -- uv run --locked --project "$SHERLOCK_ROOT/runtime" sherlock --data-dir "$SHERLOCK_DATA" --profile personal serve
 ```
 
-Start a fresh local Codex session and inspect its MCP tools. Copy the five skill directories into the working project's `.agents/skills/`. A project-scoped MCP configuration is also possible in trusted `.codex/config.toml`; preserve existing entries. [Codex MCP](https://developers.openai.com/codex/mcp) and [skills](https://learn.chatgpt.com/docs/build-skills).
+Start a fresh local Codex session and inspect its MCP tools. Copy the seven skill directories into the working project's `.agents/skills/`. A project-scoped MCP configuration is also possible in trusted `.codex/config.toml`; preserve existing entries. [Codex MCP](https://developers.openai.com/codex/mcp) and [skills](https://learn.chatgpt.com/docs/build-skills).
 
 ### Hermes
 
@@ -93,7 +93,7 @@ mcp_servers:
       - serve
 ```
 
-Copy the five skill directories into the intended profile's skills directory, then use a new session or the host's documented reload path. Do not import an unrelated existing agent profile to install Sherlock. [Hermes MCP reference](https://hermes-agent.nousresearch.com/docs/reference/mcp-config-reference) and [skills](https://hermes-agent.nousresearch.com/docs/guides/work-with-skills).
+Copy the seven skill directories into the intended profile's skills directory, then use a new session or the host's documented reload path. Do not import an unrelated existing agent profile to install Sherlock. [Hermes MCP reference](https://hermes-agent.nousresearch.com/docs/reference/mcp-config-reference) and [skills](https://hermes-agent.nousresearch.com/docs/guides/work-with-skills).
 
 ### OpenClaw
 
@@ -104,7 +104,7 @@ openclaw mcp set agent-sherlock '{"command":"uv","args":["run","--locked","--pro
 openclaw mcp probe agent-sherlock --json
 ```
 
-Copy the five skill directories into the intended agent workspace's `skills/`. Start a fresh session using a runtime/tool profile that exposes configured MCP tools. Older versions using a separate mcporter registry need their own verified setup; do not mix registry formats. [OpenClaw MCP](https://docs.openclaw.ai/cli/mcp) and [skills](https://docs.openclaw.ai/tools/skills).
+Copy the seven skill directories into the intended agent workspace's `skills/`. Start a fresh session using a runtime/tool profile that exposes configured MCP tools. Older versions using a separate mcporter registry need their own verified setup; do not mix registry formats. [OpenClaw MCP](https://docs.openclaw.ai/cli/mcp) and [skills](https://docs.openclaw.ai/tools/skills).
 
 ## Verify from your chosen host
 

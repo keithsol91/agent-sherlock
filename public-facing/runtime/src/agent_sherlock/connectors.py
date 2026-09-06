@@ -245,8 +245,23 @@ class ConnectorGateway:
 
     def _secrets(self, connection_id: str) -> tuple[str, ...]:
         transport = self._config(connection_id).get("transport", {})
-        references = {**transport.get("env_from", {}), **transport.get("headers_from_env", {})}
-        return tuple(os.environ[value] for value in references.values() if isinstance(value, str) and value in os.environ)
+        secrets = []
+        # These maps have different destinations; an identically named child
+        # environment variable and HTTP header must both retain their values.
+        for variable in transport.get("env_from", {}).values():
+            if isinstance(variable, str) and variable in os.environ:
+                secrets.append(os.environ[variable])
+        for header, variable in transport.get("headers_from_env", {}).items():
+            if not isinstance(variable, str) or variable not in os.environ:
+                continue
+            value = os.environ[variable]
+            secrets.append(value)
+            if isinstance(header, str) and header.strip().casefold() in {"authorization", "proxy-authorization"}:
+                bearer = re.fullmatch(r"[ \t]*Bearer[ \t]+([^ \t\r\n]+)[ \t]*", value, re.IGNORECASE)
+                if bearer:
+                    # Providers can echo the credential without its scheme.
+                    secrets.append(bearer.group(1))
+        return tuple(dict.fromkeys(secrets))
 
     def _mapping(self, connection_id: str, operation: str) -> dict[str, Any]:
         mapping = self._config(connection_id)["operations"].get(operation)
