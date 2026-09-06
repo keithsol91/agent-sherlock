@@ -18,7 +18,7 @@ presence of a logo or a skill does not establish a working integration.
 | Root README, license, notices, contribution, security, conduct, changelog, agent instructions, and ignore file | Public newcomer and contributor documents; each filename is explicitly listed. A complete package requires a license. |
 | `.github/` and `.devcontainer/` | Text workflow, template, and development-environment configuration only; hidden files receive the same content checks as visible files. |
 | `public-facing/runtime/` | Explicit package metadata, dependency lock, README, Python sources, and tests. Installed dependencies and runtime databases are excluded. |
-| `public-facing/skills/` | Public skill instructions and supporting text/code fixtures. Current skills cover orientation, competitor research, account context, case files, and recall. |
+| `public-facing/skills/` | Public skill instructions and supporting text/code fixtures. Current skills cover orientation, competitor research, account context, case files, recall, dormant relationships, and pitched-contact moves. |
 | `public-facing/documentation/` | Public installation, daily-use, permission, and troubleshooting guides. |
 | `public-facing/` website | Explicit top-level HTML/CSS/JavaScript files, assets, and fictional example renderers. Browser-app drafts are excluded. |
 | `public-facing/assets/examples/` | Authored fictional Slack conversations and screenshots. These illustrate an answer format and do not prove a live Slack integration. |
@@ -26,7 +26,7 @@ presence of a logo or a skill does not establish a working integration.
 | Sherlock and third-party imagery | Existing artwork and identification assets retain the scope and attribution described in [`THIRD_PARTY_NOTICES.md`](../THIRD_PARTY_NOTICES.md). Third-party marks are not covered by Sherlock's software license. |
 | `design/agent-sherlock/` | Selected design instructions, tokens, CSS, font files/notices, component guidance, validator, and the approved reference image. The image is a design reference, not a product screenshot. |
 | Root `scripts/` and `tests/` | Only the two public release scripts and Python/JSON test files; operational scripts are not an allowed category. |
-| Root `docs/` | Only this audit and [`RELEASE.md`](RELEASE.md). Working notes are not shipped. |
+| Root `docs/` | Only this audit, the release record, and [`PUBLIC_ASSET_MANIFEST.json`](PUBLIC_ASSET_MANIFEST.json). The manifest pins every shipped binary asset to a reviewed SHA-256 value. Working notes are not shipped. |
 
 ## Excluded categories
 
@@ -57,7 +57,8 @@ the script refuses to overwrite an existing destination.
 The automated checks cover:
 
 - Every file in the staged tree, including hidden files, against the publication manifest.
-- Common token, private-key, credential-URL, machine-path, and deployment-ID patterns; matching values are withheld from reports.
+- Common token, private-key, credential-URL, machine-path, deployment-ID, JWT, and generic credential-assignment patterns; every matching value is withheld from reports.
+- Every shipped binary asset against the reviewed SHA-256 manifest, plus basic scans for serialized private keys and common provider tokens in binary data.
 - Symbolic links, environment files, database/log archives, and dependency/runtime directories.
 - Local Markdown and HTML destinations and anchors, plus CSS asset paths, while ignoring fenced documentation examples and external URLs.
 - Required release files and atomic staging: a failed scan leaves no partial release directory.
@@ -84,7 +85,9 @@ commit. Commit metadata receives the same sensitive-text checks.
 
 This is an offline heuristic scan, not a guarantee that arbitrary sensitive
 content will be recognized. It does not verify remote links, inspect image
-pixels or embedded binary metadata, or establish artwork ownership. History
+pixels semantically, or establish artwork ownership. Binary scanning detects
+only the listed byte patterns; the SHA-256 manifest makes asset review explicit
+but does not prove what an image depicts. History
 checks require the explicit `--git-history` option and cover locally reachable
 commits, not remote-only refs or unreachable objects. The release package is
 assembled from reviewed source files without copying repository history.

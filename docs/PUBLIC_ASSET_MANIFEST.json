@@ -1,0 +1,20 @@
+{
+  "schema": "agent-sherlock-public-asset-manifest-v1",
+  "assets": {
+    "design/agent-sherlock/fonts/Fraunces-variable.ttf": "177ff6c0f14e5550a3c624247cd1189611d4eb65d000b14944c63d967958abbb",
+    "design/agent-sherlock/fonts/Inter-variable.ttf": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031",
+    "design/agent-sherlock/reference/approved-homepage.png": "5822da5d422741f3bc0213990fa194548b7e0d8564277036e91405fe80302a50",
+    "public-facing/assets/brands/claude-mark.png": "4004381309500f25e49a1ae639912ce307ea81da74cc383954a1ac8b9d343fe6",
+    "public-facing/assets/brands/hermes-mark.png": "5fbced606189c9bfc2925a16f8903333041cabbf1f8699fe9fe9b3e24504048f",
+    "public-facing/assets/brands/slack-mark.png": "fff0ab554a4dc202afd1cbf2033a3ad340cf25b4991035d2d31407b5e7e4c366",
+    "public-facing/assets/examples/slack-automotive-desktop.png": "230be02f83f40e73f4b098ed19c51f69fa56fbce0652ade6050fb2f9ce33e14c",
+    "public-facing/assets/examples/slack-automotive-mobile.png": "d1c23c5a0667f37736db855925a20f2f17b1bdfcec38a4be21af3614d742f19d",
+    "public-facing/assets/examples/slack-finance-desktop.png": "c90b4eb0bf19c3230d5090a351652fd5620d58315bb4b242e507ce3f5c42636a",
+    "public-facing/assets/examples/slack-finance-mobile.png": "57b5e9bb3cebccebb789ed3a516282aea161f48aa3e63411a0e91320f321fbb9",
+    "public-facing/assets/examples/slack-medical-desktop.png": "f0c93238987dc31d80e862c0300e32451441013400dc670fc27f61dcedb515ce",
+    "public-facing/assets/examples/slack-medical-mobile.png": "f69faf71b4434de0afa8643705324b8444a5e817b236b98367545426b47156df",
+    "public-facing/assets/fonts/Fraunces-variable.ttf": "177ff6c0f14e5550a3c624247cd1189611d4eb65d000b14944c63d967958abbb",
+    "public-facing/assets/fonts/Inter-variable.ttf": "29160a80ff49ddcab2c97711247e08b1fab27a484a329ce8b813d820dc559031",
+    "public-facing/assets/sherlock-hero-candidate.png": "aac729e9cc2bf59836ebe447c240823a6e9a02d8d2def1ef3e63700eb023e5fe"
+  }
+}

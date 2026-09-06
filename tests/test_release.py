@@ -74,6 +74,8 @@ class ReleaseTests(unittest.TestCase):
     def test_allowlist_uses_canonical_runtime_and_skills(self) -> None:
         for name in ["public-facing/runtime/pyproject.toml", "public-facing/runtime/uv.lock",
                      "public-facing/runtime/src/agent_sherlock/cli.py",
+                     "public-facing/runtime/src/agent_sherlock/setup.py",
+                     "docs/PUBLIC_ASSET_MANIFEST.json",
                      "public-facing/skills/agent-sherlock/SKILL.md",
                      "public-facing/documentation/quickstart.md", ".github/workflows/ci.yml"]:
             self.assertTrue(is_allowed(Path(name)), name)
@@ -115,6 +117,17 @@ class ReleaseTests(unittest.TestCase):
         self.assertFalse(any(token in str(f) for f in findings))
         self.assertIn("line 2", str(findings[0]))
 
+    def test_every_sensitive_occurrence_is_reported_without_echoing_values(self) -> None:
+        first = "gh" + "p_" + "a" * 36
+        second = "gh" + "p_" + "b" * 36
+        self.write("README.md", f"# Example\n{first}\n{second}\n")
+        findings = [item for item in check_tree(self.root, require_complete=False)
+                    if item.rule == "provider-token"]
+        self.assertEqual(len(findings), 2)
+        self.assertIn("line 2;", findings[0].detail)
+        self.assertIn("line 3;", findings[1].detail)
+        self.assertFalse(any(first in str(item) or second in str(item) for item in findings))
+
     def test_common_credentials_and_machine_paths_are_rejected(self) -> None:
         values = {
             "private-key": "-----BEGIN " + "PRIVATE KEY-----",
@@ -132,6 +145,46 @@ class ReleaseTests(unittest.TestCase):
     def test_documented_names_and_placeholder_config_do_not_trigger_secrets(self) -> None:
         self.write("README.md", '# Setup\nUse API_KEY from your environment.\napi_key = "YOUR_API_KEY"\n')
         self.assertEqual(self.rules(), set())
+
+    def test_current_token_formats_and_unquoted_assignments_are_rejected(self) -> None:
+        values = {
+            "provider-token": "pat-na1-" + "a" * 24,
+            "jwt": "eyJ" + "a" * 12 + "." + "b" * 12 + "." + "c" * 12,
+            "credential-assignment": "refresh_token = " + "a" * 27 + "1",
+        }
+        for rule, value in values.items():
+            with self.subTest(rule=rule):
+                self.write("README.md", value)
+                findings = check_tree(self.root, require_complete=False)
+                self.assertTrue(any(item.rule == rule for item in findings))
+                self.assertFalse(any(value in str(item) for item in findings))
+
+    def test_uppercase_unquoted_credential_is_not_treated_as_an_environment_reference(self) -> None:
+        value = "access_token = " + "A" * 27 + "1"
+        self.write("README.md", value)
+        findings = check_tree(self.root, require_complete=False)
+        self.assertTrue(any(item.rule == "credential-assignment" for item in findings))
+        self.assertFalse(any(value in str(item) for item in findings))
+
+    def test_binary_assets_require_reviewed_hashes_and_are_scanned(self) -> None:
+        asset = self.root / "public-facing/assets/example.png"
+        asset.parent.mkdir(parents=True)
+        payload = b"fictional binary asset"
+        asset.write_bytes(payload)
+        self.assertIn("asset-manifest", self.rules())
+
+        manifest = {"schema": "agent-sherlock-public-asset-manifest-v1",
+                    "assets": {"public-facing/assets/example.png": hashlib.sha256(payload).hexdigest()}}
+        self.write("docs/PUBLIC_ASSET_MANIFEST.json", json.dumps(manifest))
+        self.assertEqual(self.rules(), set())
+
+        secret = ("gh" + "p_" + "a" * 36).encode()
+        asset.write_bytes(secret)
+        manifest["assets"]["public-facing/assets/example.png"] = hashlib.sha256(secret).hexdigest()
+        self.write("docs/PUBLIC_ASSET_MANIFEST.json", json.dumps(manifest))
+        findings = check_tree(self.root, require_complete=False)
+        self.assertTrue(any(item.rule == "provider-token" for item in findings))
+        self.assertFalse(any(secret.decode() in str(item) for item in findings))
 
     def test_symlink_escape_is_never_copied(self) -> None:
         outside = Path(self.temp.name) / "outside.md"

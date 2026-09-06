@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import argparse
 from dataclasses import dataclass
+import hashlib
 from html.parser import HTMLParser
+import json
 from pathlib import Path
 import re
 import subprocess
@@ -22,7 +24,7 @@ ROOT_FILES = frozenset({
     "CONTRIBUTING.md", "SECURITY.md", "CODE_OF_CONDUCT.md", "CHANGELOG.md",
 })
 PUBLIC_DOCS = frozenset({
-    "FILE-AUDIT.md", "RELEASE.md",
+    "FILE-AUDIT.md", "PUBLIC_ASSET_MANIFEST.json", "RELEASE.md",
 })
 DESIGN_FILES = frozenset({
     "AGENT-INSTRUCTIONS.md", "DESIGN-SYSTEM.md", "CHANGELOG.md",
@@ -66,6 +68,9 @@ REQUIRED_FILES = frozenset({
     "public-facing/runtime/src/agent_sherlock/__main__.py",
     "public-facing/runtime/src/agent_sherlock/cli.py",
     "public-facing/runtime/src/agent_sherlock/server.py",
+    "public-facing/runtime/src/agent_sherlock/setup.py",
+    "public-facing/runtime/src/agent_sherlock/setup_check.py",
+    "public-facing/runtime/src/agent_sherlock/setup_hosts.py",
     "public-facing/skills/agent-sherlock/SKILL.md",
     "public-facing/skills/sherlock-account-context/SKILL.md",
     "public-facing/skills/sherlock-competitor-research/SKILL.md",
@@ -81,13 +86,25 @@ REQUIRED_FILES = frozenset({
 })
 PATTERNS = (
     ("private-key", re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----")),
-    ("provider-token", re.compile(r"\b(?:sk-(?:proj-|ant-api\d+-)?[A-Za-z0-9_-]{24,}|gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|xox[baprs]-[A-Za-z0-9-]{20,})\b")),
+    ("provider-token", re.compile(r"\b(?:sk[-_](?:proj-|ant-api\d+-)?[A-Za-z0-9_-]{24,}|gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|xox[baprs]-[A-Za-z0-9-]{20,}|pat-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{35,})\b")),
     ("aws-key", re.compile(r"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b")),
+    ("jwt", re.compile(r"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b")),
     ("machine-path", re.compile(r"(?:/Users/|/home/)[A-Za-z0-9_.-]+/|[A-Z]:\\Users\\[A-Za-z0-9_.-]+\\")),
     ("deployment-id", re.compile(r"\b(?:dpl|prj)_[A-Za-z0-9]{16,}\b")),
     ("credential-url", re.compile(r"https?://[^\s/@:]+:[^\s/@]+@")),
-    ("credential-assignment", re.compile(r'''(?im)(?:api[_-]?key|access[_-]?token|client[_-]?secret|password)\s*["']?\s*[:=]\s*["']([A-Za-z0-9_+/=-]{20,})["']''')),
+    ("credential-assignment", re.compile(r'''(?m)(?i:api[_-]?key|access[_-]?token|client[_-]?secret|password|refresh[_-]?token)\s*["']?\s*[:=]\s*(?:["'][A-Za-z0-9_+/=-]{20,}["']|(?![A-Z][A-Z0-9_]*_[A-Z0-9_]*\b)(?=[A-Za-z0-9_+/=-]{20,}\b)(?=[A-Za-z0-9_+/=-]*[0-9+/=-])[A-Za-z0-9_+/=-]{20,})''')),
 )
+
+# Binary files are not decoded as text, but obvious serialized credentials must
+# still fail the release check. The asset manifest below makes every shipped
+# binary a deliberate, reviewable input rather than an opaque exception.
+BINARY_PATTERNS = (
+    ("private-key", re.compile(br"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----")),
+    ("provider-token", re.compile(br"\b(?:sk[-_][A-Za-z0-9_-]{24,}|gh[pousr]_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{30,}|xox[baprs]-[A-Za-z0-9-]{20,}|pat-[A-Za-z0-9_-]{20,}|AIza[A-Za-z0-9_-]{35,})\b")),
+    ("aws-key", re.compile(br"\b(?:AKIA|ASIA)[A-Z0-9]{16}\b")),
+    ("jwt", re.compile(br"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b")),
+)
+ASSET_MANIFEST = Path("docs/PUBLIC_ASSET_MANIFEST.json")
 
 
 @dataclass(frozen=True)
@@ -134,6 +151,53 @@ def forbidden_path(relative: Path) -> str | None:
 def files_under(root: Path) -> list[Path]:
     """Return hidden entries too; callers reject all symbolic links."""
     return sorted((path for path in root.rglob("*") if path.is_file() or path.is_symlink()), key=lambda p: p.as_posix())
+
+
+def binary_assets(root: Path) -> list[Path]:
+    return [path for path in files_under(root)
+            if not path.is_symlink()
+            and path.suffix.lower() not in TEXT_SUFFIXES
+            and path.name not in ROOT_FILES
+            and is_allowed(path.relative_to(root))
+            and forbidden_path(path.relative_to(root)) is None]
+
+
+def check_binary_assets(root: Path) -> list[Finding]:
+    """Verify every packaged binary is reviewed and lacks obvious credentials."""
+    assets = binary_assets(root)
+    if not assets:
+        return []
+    manifest_path = root / ASSET_MANIFEST
+    if not manifest_path.is_file():
+        return [Finding(ASSET_MANIFEST.as_posix(), "asset-manifest", "binary assets require a reviewed SHA-256 manifest")]
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        entries = manifest["assets"]
+        if manifest.get("schema") != "agent-sherlock-public-asset-manifest-v1" or not isinstance(entries, dict):
+            raise ValueError
+    except (OSError, UnicodeDecodeError, ValueError, TypeError, KeyError):
+        return [Finding(ASSET_MANIFEST.as_posix(), "asset-manifest", "manifest must contain a valid reviewed asset map")]
+
+    findings = []
+    expected = {path.relative_to(root).as_posix() for path in assets}
+    listed = set(entries)
+    for name in sorted(expected - listed):
+        findings.append(Finding(name, "asset-manifest", "binary asset is not in the reviewed manifest"))
+    for name in sorted(listed - expected):
+        findings.append(Finding(name, "asset-manifest", "manifest references a binary asset absent from this release"))
+    for path in assets:
+        name = path.relative_to(root).as_posix()
+        value = entries.get(name)
+        if not isinstance(value, str) or not re.fullmatch(r"[0-9a-f]{64}", value):
+            findings.append(Finding(name, "asset-manifest", "asset needs a SHA-256 value"))
+            continue
+        data = path.read_bytes()
+        if hashlib.sha256(data).hexdigest() != value:
+            findings.append(Finding(name, "asset-manifest", "asset does not match its reviewed SHA-256 value"))
+        for rule, pattern in BINARY_PATTERNS:
+            if pattern.search(data):
+                findings.append(Finding(name, rule, "possible sensitive binary content; value withheld"))
+    return findings
 
 
 def source_files(root: Path) -> list[Path]:
@@ -274,12 +338,12 @@ def check_tree(root: Path, *, require_complete: bool = True, links: bool = True)
             findings.append(Finding(name, "text-encoding", "expected UTF-8 text"))
             continue
         for rule, pattern in PATTERNS:
-            match = pattern.search(content)
-            if match:
+            for match in pattern.finditer(content):
                 line = content.count("\n", 0, match.start()) + 1
                 findings.append(Finding(name, rule, f"possible sensitive content on line {line}; value withheld"))
         if links:
             findings.extend(check_links(root, path, content))
+    findings.extend(check_binary_assets(root))
     return findings
 
 
@@ -343,12 +407,12 @@ def check_git_history(repository: Path) -> list[Finding]:
                 except UnicodeDecodeError:
                     continue
                 for rule, pattern in PATTERNS:
-                    if pattern.search(content):
-                        findings.append(Finding(label, rule, "possible sensitive content in committed blob; value withheld"))
+                    for occurrence, _match in enumerate(pattern.finditer(content), start=1):
+                        findings.append(Finding(label, rule, f"possible sensitive content occurrence {occurrence} in committed blob; value withheld"))
             message = git("cat-file", "commit", revision).decode("utf-8", errors="replace")
             for rule, pattern in PATTERNS:
-                if pattern.search(message):
-                    findings.append(Finding(f"git:{revision[:12]}", rule, "possible sensitive content in commit metadata; value withheld"))
+                for occurrence, _match in enumerate(pattern.finditer(message), start=1):
+                    findings.append(Finding(f"git:{revision[:12]}", rule, f"possible sensitive content occurrence {occurrence} in commit metadata; value withheld"))
     except (OSError, ValueError, subprocess.TimeoutExpired) as error:
         detail = str(error) if isinstance(error, ValueError) else "Git history unavailable or command timed out"
         findings.append(Finding("git-history", "history", detail))

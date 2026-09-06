@@ -24,6 +24,16 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--profile", help="Organization profile; default, or demo for the demo command.")
     p.add_argument("--config", help="Operator-owned JSON connector and save-policy configuration.")
     sub = p.add_subparsers(dest="command", required=True)
+    setup = sub.add_parser("setup", help="Install Sherlock's runtime and skills, configure your agent, and check local recall.")
+    setup.add_argument("--host", choices=("claude-code", "codex", "manual"))
+    setup.add_argument("--scope", choices=("user", "project"), default="user")
+    setup.add_argument("--project", type=Path, help="Existing project folder for project-scoped setup.")
+    setup.add_argument("--install-dir", type=Path, help="Private folder for managed software and settings backups.")
+    setup.add_argument("--host-config", type=Path, help="Explicit agent configuration path for a custom host installation.")
+    setup.add_argument("--skills-dir", type=Path, help="Explicit agent skill folder for a custom host installation.")
+    setup.add_argument("--dry-run", action="store_true", help="Preview paths and conflicts without writing setup files.")
+    setup.add_argument("--yes", action="store_true", help="Install the selected setup without another terminal prompt.")
+    setup.add_argument("--json", action="store_true", help="Print a machine-readable preview or result.")
     for command in ("doctor", "serve", "export", "changes"):
         sub.add_parser(command)
     sub.add_parser("demo").add_argument("--full", action="store_true", help="Include complete fictional evidence and findings in the JSON output.")
@@ -66,6 +76,9 @@ def parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = parser().parse_args(argv)
     try:
+        if args.command == "setup":
+            from .setup import run_setup
+            return run_setup(args)
         if args.command == "demo" and args.config:
             raise ValueError("Demo does not load a provider configuration.")
         settings = load_settings(args.data_dir,

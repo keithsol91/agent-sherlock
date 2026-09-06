@@ -1,19 +1,34 @@
-# Compatibility and evidence
+# Supported setup paths and verification
 
 Read this table as a record of what has been checked, not a promise that a matching product name guarantees interoperability. Host versions and MCP tool schemas can change. Configuration recipes were checked against official sources on 6 September 2026; live host and provider checks must be recorded against the release candidate separately.
 
+The guided installer is included in public release 0.2.1a1. It can prepare user
+or project settings for Claude Code and Codex, or generate settings for another
+local agent to install manually. Its local
+check uses an MCP client to save a fictional case, evidence, and a finding, then
+read and recall them after restarting the service. That result proves the local
+service works in the check; your chosen agent still needs to load and accept the
+installation. It does not promote the older host test results below to this build.
+
 | Surface | Intended connection | Current evidence / boundary |
 | --- | --- | --- |
-| Local Python runtime | Source checkout, Python 3.11+, stdio MCP | Implementation and local test results are maintained with the runtime; inspect the release verification record. |
-| Claude Code | Local stdio MCP plus skill folders | Claude Code 2.1.261: limited fictional case/evidence/recall, skill loading, and restart smoke passed; see the scoped evidence below. |
-| Codex local clients | Local stdio MCP plus skill folders | Official setup syntax and local CLI help checked; Sherlock host smoke pending. |
+| Local Python runtime | Managed installation or source checkout, Python 3.11+, stdio MCP | Guided setup performs an isolated local connection and persistence check. Runtime and release verification are recorded separately. |
+| Claude Code | Guided user/project setup, or manual local MCP plus skills | The new installer prepares settings; host acceptance still requires verification. Claude Code 2.1.261 passed a limited test of an older Sherlock snapshot; see below. |
+| Codex local clients | Guided user/project setup, or manual local MCP plus skills | Official setup syntax and local CLI help checked. The new installer prepares settings; Sherlock host smoke remains pending. |
 | Hermes | `mcp_servers` YAML plus skill folders | Official configuration shape checked; Sherlock host smoke pending. |
 | OpenClaw | Outbound `mcp.servers` registry plus workspace skills | Current official registry documented; Sherlock host smoke pending. Legacy mcporter needs separate validation. |
 | ChatGPT web / remote host | Separate authenticated remote MCP deployment | Not supplied by this local stdio build. Do not paste a local filesystem path into a remote-server URL field. |
 | HubSpot via configured adapter | User-owned CRM account and required scopes | Fixture/contract tests and live-account verification are separate. Do not infer a working connection from a successful demo. |
 | Composio or custom CRM MCP | Explicitly mapped gateway tools and account identity | Compatibility depends on actual tool schemas, records, readback, and write policy. Generic MCP support alone is insufficient. |
 | Research sources | Existing host search/browser or user-supplied sources | Sherlock stores evidence; the local service does not itself crawl social platforms or buy research access. |
-| Slack | Installer-owned workspace/account and app or connector credentials, through the selected host | Each installer configures their own connection and workspace/channel/sender/profile binding; see [Slack setup](slack.md). Live delivery/readback remains unverified. A standalone Slack bot is not included in this preview. |
+| Slack | Your workspace and app or connector, through the selected host | Optional setup after installation; see [Slack setup](slack.md). Live delivery/readback remains unverified. A standalone Slack bot is not included in this preview. |
+
+The installer writes Claude Code's user MCP entry in `~/.claude.json` and its
+skills in `~/.claude/skills/`. Codex uses `config.toml` under `CODEX_HOME`
+(`~/.codex` by default) and `~/.agents/skills/`. Project setup uses `.mcp.json`
+and `.claude/skills/` for Claude Code, or `.codex/config.toml` and
+`.agents/skills/` for Codex. Custom destinations can be selected during setup.
+The [installation guide](install.md) links the official host references.
 
 ## How a connection earns a compatibility label
 
@@ -42,9 +57,9 @@ These guides intentionally avoid a blanket “works with every agent/CRM” clai
 
 ## Relationship review extension
 
-The portable relationship import, deterministic rules, local review queue, and owner feedback
-are a local development extension. Existing host/provider results above describe their
-original scopes and do not certify these new workflows. The repository's fictional runtime
+The portable relationship import, deterministic rules, local review queue, and
+owner feedback are included in the public preview. Existing host/provider results
+above describe their original scopes and do not certify these workflows. The repository's fictional runtime
 and protocol tests cover the extension separately. There is no supplied Sales Navigator
 connector, CRM communication-history collector, or built-in scheduler. See the
 [relationship guide](relationships.md) for required inputs and host boundaries.

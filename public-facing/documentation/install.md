@@ -1,68 +1,177 @@
-# Install Agent Sherlock from this checkout
+# Install Sherlock in your agent
 
-Sherlock is a Python MCP service plus seven portable instruction skills. Your existing agent supplies the model, research tools, and optional connected services. This preview is installed from the [GitHub source repository](https://github.com/keithsol91/agent-sherlock). Read the [compatibility status](compatibility.md) before choosing a host.
+Sherlock adds skills and local case storage to an agent you already use. The
+agent supplies the model and research tools. Start with installation; Slack and
+CRM connections can come later.
 
-Each installer connects their own Slack workspace/account using their own app installation and credentials. Installing Sherlock does not connect Slack automatically or supply the author's workspace, app, credentials, or history. The current path uses the installer's selected host to handle Slack; see [Slack setup](slack.md).
+> Guided setup is included in public release 0.2.1a1. If you are using an
+> earlier release without `sherlock setup`, use
+> [manual installation](#manual-installation).
 
-## First run without provider keys
+## Quick setup
 
-You need Python 3.11 or later and [uv](https://docs.astral.sh/uv/getting-started/installation/). The commands below use a POSIX shell on macOS or Linux. Runtime tests and the fictional demo pass on Windows with Python 3.11 and 3.13; interactive Windows agent setup and WSL remain unverified. The shell examples below are not native PowerShell commands.
-
-Set the source directory to the folder containing `runtime/`, `skills/`, and `documentation/`. Replace the example path with your downloaded checkout's absolute path. Keep the quotes when it contains spaces. Choose a private data directory outside the checkout.
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/) once.
+   It can also install Python 3.11 or later, which Sherlock needs.
+2. Open a terminal in this checkout's top folder, where `README.md` and
+   `public-facing/` are located.
+3. Run this command:
 
 ```sh
-SHERLOCK_ROOT="/absolute/path/to/Agent Sherlock/public-facing"
+uv run --locked --project public-facing/runtime sherlock setup
+```
+
+Choose **Claude Code**, **Codex**, or **another agent**. Review the suggested
+locations and continue. The defaults install Sherlock for your user account,
+include all seven skills, and keep case files in a private folder using the
+`default` profile. A profile is a separate set of case files.
+
+With the default locations, setup copies the runtime and skills into a managed
+folder outside this checkout and installs the locked dependencies. It tests the actual local connection by
+creating a fictional case, adding evidence and a finding, and recalling them
+after restarting Sherlock. This check uses isolated test data. Once it passes,
+setup adds Sherlock to the selected agent's settings and installs the skills.
+It prints the installed locations and the next step. After a successful default setup,
+the downloaded source folder is no longer needed to run that installed copy.
+
+For **another agent**, setup prepares the local installation and gives you a
+connection settings file and skill paths. Add these using your agent's own
+instructions; that final connection remains a manual step.
+
+Setup needs network access to download Python or dependencies when they are
+missing. It does not ask for API keys, connect accounts, or send messages. By
+default it creates an empty private operator configuration for the selected
+profile; it does not import another agent's connections.
+
+## Finish in your agent
+
+Restart your agent after setup. Accept its trust or connection prompt if one
+appears. In Claude Code, check `/mcp`; in Codex, inspect the available MCP tools.
+Ask your agent to call `sherlock_status` and confirm that Sherlock's skills are
+available. The [compatibility guide](compatibility.md) distinguishes local tests
+from tests inside each named agent.
+
+The installer can verify the local service and write connection settings. Your
+agent still has to load and accept them. Slack delivery and CRM access each
+need their own setup and verification later.
+
+## Let your agent handle installation
+
+Open this checkout in a local agent that can run commands and paste:
+
+```text
+Set up Agent Sherlock from this checkout. Read README.md and
+public-facing/documentation/install.md. Use the guided setup for this local
+agent with the default private storage and all seven skills. Preserve existing
+settings and stop if a Sherlock entry or skill conflicts. Report the local
+check result, installed locations, and any restart or trust step I must finish.
+Keep this to installation: do not request credentials, connect Slack or a CRM,
+enable automatic saves, send messages, or publish anything.
+```
+
+A remote chat window cannot install software on your computer simply by reading
+this prompt. Use a local agent with permission to install tools.
+
+## Preview or customize setup
+
+Most people can use the defaults. To preview the planned locations and changes
+without having setup write them:
+
+```sh
+uv run --locked --project public-facing/runtime sherlock setup --host codex --dry-run
+```
+
+The `uv run` launcher may still download or prepare its own dependencies before
+Sherlock starts. `--dry-run` prevents setup's installation and host-setting
+writes.
+
+To install in a chosen agent without interactive questions:
+
+```sh
+uv run --locked --project public-facing/runtime sherlock setup --host claude-code --yes
+```
+
+Use `--host codex` for Codex or `--host manual` for another agent. `--yes` accepts
+the planned setup; it does not bypass conflicts, local verification, or the
+agent's own trust prompts. An identical rerun is safe. If an existing Sherlock
+entry or skill differs, setup stops for you to resolve it. Unrelated settings
+are preserved, and edited host configuration files receive private backups.
+
+| Option | When to use it |
+| --- | --- |
+| `--scope user` | Default: make Sherlock available to your user account. |
+| `--scope project --project "/absolute/path/to/project"` | Make the agent settings and skills apply to one project. |
+| `--install-dir PATH` | Choose where the managed runtime and skills are installed. |
+| `--host-config PATH` | Select a custom host configuration file. |
+| `--skills-dir PATH` | Select a custom destination for the seven skills. |
+| `--json` | Return setup results in a format scripts can read. |
+
+Global options go **before** `setup` or another subcommand. For example:
+
+```sh
+uv run --locked --project public-facing/runtime sherlock --data-dir "/absolute/path/to/private/sherlock-data" --profile personal setup --host codex
+```
+
+`--config PATH` is also a global option for an explicitly selected operator
+configuration. Keep the same data directory, profile, and configuration when
+running later commands. The setup summary gives you the installed paths to use.
+For scripts, combine `--json` with an explicit `--host` and either `--dry-run`
+or `--yes`.
+
+## Try a fictional demo
+
+To try Sherlock's local case and recall features before installing it in an agent:
+
+```sh
+uv run --locked --project public-facing/runtime sherlock demo
+```
+
+The demo uses fictional records in a separate demo profile. It needs no API keys
+and does not connect your CRM, use a model, or send messages. The first run may
+download dependencies. A passing demo confirms that local demonstration only.
+
+## Manual installation
+
+Use this path when you want to manage the files yourself or are installing an
+earlier release. Download the [source repository](https://github.com/keithsol91/agent-sherlock)
+with **Code → Download ZIP**, then extract it. Install uv first.
+
+The commands in this section use a macOS or Linux shell. The runtime and
+fictional demo have Windows test coverage; native Windows host installation and
+WSL need separate verification. These variable assignments are not PowerShell
+syntax.
+
+Choose a permanent location for the source folder: the manual host connection
+will use it. Set `SHERLOCK_ROOT` to its `public-facing` folder and choose a
+private data folder outside the source. Replace the example path below and
+keep the quotes around paths with spaces.
+
+```sh
+SHERLOCK_ROOT="/absolute/path/to/agent-sherlock/public-facing"
 SHERLOCK_DATA="$HOME/agent-sherlock-data"
 uv sync --locked --project "$SHERLOCK_ROOT/runtime"
 uv run --locked --project "$SHERLOCK_ROOT/runtime" sherlock --data-dir "$SHERLOCK_DATA" --profile personal doctor
 uv run --locked --project "$SHERLOCK_ROOT/runtime" sherlock --data-dir "$SHERLOCK_DATA" demo
 ```
 
-Dependency installation can use the network. The demo itself uses fictional records in a separate demo profile and does not require CRM, model, or research-provider keys. It creates a private demo config and a fictional CRM store, and prints their actual location plus the fixture record/connection IDs. The summary includes `fictional: true`, `network_calls: 0`, and two fictional medical clients. Add `--full` after `demo` for the expanded case/evidence output. This proves the local demonstration path only. A passing doctor does not prove a live provider connection or host installation.
-
-Global options such as `--data-dir`, `--profile`, and `--config` go **before** `doctor`, `demo`, `serve`, and the other subcommands. Keep the same data directory and profile in your host configuration and later operating commands.
-
-## Give this to your agent
-
-After replacing the source path, paste this into the local host you want to use:
-
-```text
-Set up Agent Sherlock from /absolute/path/to/Agent Sherlock/public-facing.
-Read documentation/install.md, documentation/compatibility.md,
-documentation/permissions.md, and documentation/slack.md. Inspect the package's help and configuration
-example. Use a private data directory outside the source checkout. Run doctor
-and the fictional no-provider demo, then register the local stdio MCP server
-with this host and install all seven folders from skills/ in its supported
-skills directory. Preserve unrelated host settings and existing skill files;
-show me conflicts before replacing them. Use the same selected profile for
-the host and CLI. Verify tool discovery and case save/read/recall in a test
-profile, then report which checks actually passed. Keep approval-required CRM
-writes as the default. Next resolve my selected Slack workspace/account, my
-app installation and credentials, allowed channels and senders, and the
-Sherlock profile they may access. Resolve my selected CRM account as well.
-Configure those provider connections only within my authorization; use any
-scope I have already authorized and ask only for missing information or scope.
-Do not assume the author or this host has already connected my accounts.
-Keep credentials private. Verify the authorized Slack destination and read
-back any authorized test reply there. Report local recall, Slack delivery,
-and CRM verification separately. Do not enable autosave or publish anything.
-```
-
-This handoff asks your agent to perform installation. The guide itself has not changed your host settings. Review any host-level prompts your environment requires.
-
-## Connect one local host
-
-These are configuration recipes derived from the hosts' official documentation. Sherlock's host smoke results are tracked separately in [compatibility.md](compatibility.md). Use one host path, not all four. If `uv` is absent from the host's PATH, replace `uv` with the absolute path printed by `command -v uv`.
+Choose one host below. Preserve unrelated host settings and existing skill
+folders. If a Sherlock entry or skill already exists, compare it before making
+changes. If the host cannot find uv, use the absolute executable path printed
+by `command -v uv`.
 
 ### Claude Code
 
-From the working project where you want Sherlock available, with the variables above still set:
+For your user account:
 
 ```sh
-claude mcp add --transport stdio --scope local agent-sherlock -- uv run --locked --project "$SHERLOCK_ROOT/runtime" sherlock --data-dir "$SHERLOCK_DATA" --profile personal serve
+claude mcp add --transport stdio --scope user agent-sherlock -- uv run --locked --project "$SHERLOCK_ROOT/runtime" sherlock --data-dir "$SHERLOCK_DATA" --profile personal serve
 ```
 
-Open a new Claude Code session and check `/mcp`. The `local` scope ties this registration to the current project. Copy the seven skill directories into that project's `.claude/skills/`, preserving any existing folders with the same name. [Claude Code MCP](https://code.claude.com/docs/en/mcp) and [skills](https://code.claude.com/docs/en/skills).
+Copy all seven directories from `$SHERLOCK_ROOT/skills/` into `~/.claude/skills/`.
+The user MCP settings live in `~/.claude.json`. For one project, run the command
+from that project with `--scope project` and put the skills in `.claude/skills/`;
+the MCP entry goes in `.mcp.json`. Restart Claude Code and check `/mcp`.
+See the official [MCP](https://code.claude.com/docs/en/mcp) and
+[skills](https://code.claude.com/docs/en/skills) guides.
 
 ### Codex
 
@@ -70,11 +179,17 @@ Open a new Claude Code session and check `/mcp`. The `local` scope ties this reg
 codex mcp add agent-sherlock -- uv run --locked --project "$SHERLOCK_ROOT/runtime" sherlock --data-dir "$SHERLOCK_DATA" --profile personal serve
 ```
 
-Start a fresh local Codex session and inspect its MCP tools. Copy the seven skill directories into the working project's `.agents/skills/`. A project-scoped MCP configuration is also possible in trusted `.codex/config.toml`; preserve existing entries. [Codex MCP](https://developers.openai.com/codex/mcp) and [skills](https://learn.chatgpt.com/docs/build-skills).
+Copy all seven skill directories into `~/.agents/skills/`. The user MCP settings
+live in `~/.codex/config.toml`, or `config.toml` under a custom `CODEX_HOME`.
+For one trusted project, use `.codex/config.toml` and `.agents/skills/` in that
+project. Start a fresh local Codex session and inspect its MCP tools.
+See the official [MCP](https://developers.openai.com/codex/mcp) and
+[skills](https://learn.chatgpt.com/docs/build-skills) guides.
 
 ### Hermes
 
-Merge this entry into the intended Hermes profile's `config.yaml`. Replace both example paths with absolute paths; do not replace the entire configuration.
+Add this entry to the intended Hermes profile's `config.yaml`. Replace the two
+example paths with absolute paths and preserve the rest of the configuration.
 
 ```yaml
 mcp_servers:
@@ -84,7 +199,7 @@ mcp_servers:
       - run
       - --locked
       - --project
-      - /absolute/path/to/Agent Sherlock/public-facing/runtime
+      - /absolute/path/to/agent-sherlock/public-facing/runtime
       - sherlock
       - --data-dir
       - /absolute/path/to/private/sherlock-data
@@ -93,29 +208,40 @@ mcp_servers:
       - serve
 ```
 
-Copy the seven skill directories into the intended profile's skills directory, then use a new session or the host's documented reload path. Do not import an unrelated existing agent profile to install Sherlock. [Hermes MCP reference](https://hermes-agent.nousresearch.com/docs/reference/mcp-config-reference) and [skills](https://hermes-agent.nousresearch.com/docs/guides/work-with-skills).
+Copy the seven skill directories into the intended profile's skills directory,
+then start a new session or use the host's documented reload path. Use your own
+profile settings. See the official [MCP reference](https://hermes-agent.nousresearch.com/docs/reference/mcp-config-reference)
+and [skills guide](https://hermes-agent.nousresearch.com/docs/guides/work-with-skills).
 
 ### OpenClaw
 
-Current OpenClaw documentation describes an outbound MCP registry. This is separate from `openclaw mcp serve`, which exposes OpenClaw itself to another client. Replace the example paths before running:
+Use the outbound MCP registry. Replace the example paths before running:
 
 ```sh
-openclaw mcp set agent-sherlock '{"command":"uv","args":["run","--locked","--project","/absolute/path/to/Agent Sherlock/public-facing/runtime","sherlock","--data-dir","/absolute/path/to/private/sherlock-data","--profile","personal","serve"]}'
+openclaw mcp set agent-sherlock '{"command":"uv","args":["run","--locked","--project","/absolute/path/to/agent-sherlock/public-facing/runtime","sherlock","--data-dir","/absolute/path/to/private/sherlock-data","--profile","personal","serve"]}'
 openclaw mcp probe agent-sherlock --json
 ```
 
-Copy the seven skill directories into the intended agent workspace's `skills/`. Start a fresh session using a runtime/tool profile that exposes configured MCP tools. Older versions using a separate mcporter registry need their own verified setup; do not mix registry formats. [OpenClaw MCP](https://docs.openclaw.ai/cli/mcp) and [skills](https://docs.openclaw.ai/tools/skills).
+Copy the seven skill directories into the intended agent workspace's `skills/`.
+Start a fresh session with a tool profile that exposes the configured MCP tools.
+`openclaw mcp serve` exposes OpenClaw itself; it does not register Sherlock.
+Older versions using a separate mcporter registry need their own verified setup.
+See the official [MCP](https://docs.openclaw.ai/cli/mcp) and
+[skills](https://docs.openclaw.ai/tools/skills) guides.
 
-## Verify from your chosen host
+### Verify a manual connection
 
-Ask the host to discover Sherlock's tools and call `sherlock_status`. In a dedicated test profile, create a fictional case with `case_create`, read it with `case_get`, add sourced fictional evidence and a finding, and retrieve it with `recall_search`. Confirm the same case is available after restarting that host. A host may prefix tool names; use the discovered schema rather than guessing the prefix.
+Ask the host to discover Sherlock's tools and call `sherlock_status`. For a
+persistence check, temporarily select a dedicated test profile in the host's
+Sherlock settings. Create and read a fictional case with `case_create` and
+`case_get`, add fictional evidence and a finding, and retrieve it with
+`recall_search`. Restart the host and confirm that the same records are still
+available, then switch back to your chosen profile. Use the tool schemas the
+host discovers; it may add a prefix to tool names.
 
-Do not run `serve` as a background web server: it is a stdio process started by the MCP host and waits for protocol messages on stdin. It does not supply a browser sign-in page or public HTTP endpoint.
+`serve` is a local stdio service: your agent starts it and talks to it directly.
+It does not open a web page or run a public web server.
 
-## Connect your own Slack workspace
-
-Follow [slack.md](slack.md) to configure your own workspace and app credentials through your selected host. Resolve the workspace ID, app/bot identity, allowed channel IDs and senders, and the Sherlock profile before enabling access. An existing host's ability to support Slack does not prove your account is connected or authorized.
-
-Verify local recall and an authorized test reply separately, including readback in the intended Slack destination. A standalone Slack bot is not included in this preview; this build uses the selected host's Slack handling.
-
-Next: [daily recipes](daily-recipes.md), [Slack setup](slack.md), [CRM integrations](integrations.md), [permissions](permissions.md), [operations](operations.md), and [troubleshooting](troubleshooting.md).
+Next: [daily recipes](daily-recipes.md), [troubleshooting](troubleshooting.md),
+[Slack setup](slack.md), [CRM integrations](integrations.md), and
+[permissions](permissions.md).

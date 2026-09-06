@@ -8,54 +8,43 @@
 prepare account briefs, keep living case files, and recall the evidence your
 next conversation needs.
 
-Sherlock is seven portable skills plus a local MCP service. Your agent does the
-research and reasoning. Sherlock keeps the sources, findings, history, relationship reviews, and
-controlled CRM changes organized in your own profile.
+Sherlock adds seven skills and a small local service to your agent. Your agent
+does the research and reasoning. Sherlock saves the sources, findings, and
+case history so you can pick up where you left off.
 
 [Get started](#try-sherlock) · [Install in your agent](public-facing/documentation/install.md)
 · [Daily recipes](public-facing/documentation/daily-recipes.md)
 · [Compatibility](public-facing/documentation/compatibility.md)
 · [Contribute](CONTRIBUTING.md)
 
-> **Early preview · 0.2.0a1.** Start with the fictional demo, then connect your
-> chosen agent. Named agent and CRM connections have individual verification
-> states in the compatibility guide. A passing demo does not certify a live
-> CRM connection, delivered Slack message, or every host.
+> **Early preview · 0.2.1a1.** The guided setup below is included in this
+> release. Host acceptance and provider checks remain separate and are recorded
+> in the compatibility guide.
 
 ## Try Sherlock
 
-Download this repository with **Code → Download ZIP**, extract it, and open a
-terminal in the extracted repository folder. Install
-[uv](https://docs.astral.sh/uv/getting-started/installation/) first. The runtime
-requires Python 3.11 or later; uv can provision a compatible Python when needed.
-
-With Git installed, you can clone it instead:
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) once; it
+can also install the Python version Sherlock needs. In this working copy,
+open a terminal in the folder containing this README and run:
 
 ```sh
-git clone https://github.com/keithsol91/agent-sherlock.git
-cd agent-sherlock
+uv run --locked --project public-facing/runtime sherlock setup
 ```
 
-Then run:
+Choose **Claude Code**, **Codex**, or **another agent**, then review the suggested
+locations. Setup installs Sherlock and all seven skills, checks that a fictional
+case can be saved and recalled after a restart, and prepares the connection to
+your agent. The default locations keep the installed copy and your case files
+outside the download folder. You do not need API keys for this step.
 
-```sh
-uv run --locked --project public-facing/runtime sherlock demo
-```
+When setup finishes, restart your agent and follow the printed next step.
+Claude Code and Codex may ask you to trust or enable the new connection.
+For another agent, setup gives you the settings to add manually. Installing the
+files and passing the local check are separate from your agent accepting them.
 
-The demo uses fictional records in a separate demo profile. It exercises a local
-case, evidence, research coverage, and recall without API keys. The
-first run downloads the locked software dependencies; the demo does not connect
-your CRM, use a model, or send messages.
-
-For local configuration diagnostics:
-
-```sh
-uv run --locked --project public-facing/runtime sherlock doctor
-```
-
-The [installation guide](public-facing/documentation/install.md) covers host
-setup, explicit data paths, skill installation, and the first persistent case.
-Global flags such as `--data-dir` and `--profile` go before the subcommand.
+See the [installation guide](public-facing/documentation/install.md) for a demo,
+custom options, and manual installation. Slack and CRM connections are optional
+later steps.
 
 ## Let your agent handle setup
 
@@ -63,14 +52,12 @@ Open this checkout in your local agent and paste:
 
 ```text
 Set up Agent Sherlock from this checkout. Read README.md and
-public-facing/documentation/install.md, compatibility.md, and permissions.md.
-Run the locked setup, doctor, and fictional demo. Install all seven public-facing
-skill folders and register this checkout's local stdio MCP service with this
-host, preserving unrelated configuration. Use an explicit private data directory
-and profile. Verify tool discovery and a fictional case save/read/recall across
-a restart. Report what passed and what still needs my input. Keep CRM writes
-approval-required; leave provider connections and automatic saves for a separate
-setup decision with me.
+public-facing/documentation/install.md. Use the guided setup for this local
+agent with the default private storage and all seven skills. Preserve existing
+settings and stop if a Sherlock entry or skill conflicts. Report the local
+check result, installed locations, and any restart or trust step I must finish.
+Keep this to installation: do not request credentials, connect Slack or a CRM,
+enable automatic saves, send messages, or publish anything.
 ```
 
 This is for an agent running locally with permission to install tools. A remote

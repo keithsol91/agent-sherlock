@@ -25,6 +25,14 @@ html { scroll-padding-block: var(--sherlock-space-24); }
   line-height: var(--sherlock-leading-heading);
 }
 .skill-detail { margin-block-start: auto; min-height: var(--sherlock-size-control-compact); display: inline-flex; align-items: center; }
+.relationship-heading { display: grid; gap: var(--sherlock-space-16); max-width: 54rem; }
+.relationship-heading h2 { max-width: 23ch; }
+.relationship-paths { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sherlock-space-32); margin-block: var(--sherlock-space-32); }
+.relationship-path { min-width: 0; padding-block-start: var(--sherlock-space-24); border-block-start: 2px solid var(--sherlock-color-border-decorative); }
+.relationship-path h3 { margin-block-end: var(--sherlock-space-16); }
+.relationship-path p { max-width: 48ch; }
+.relationship-review { display: grid; gap: var(--sherlock-space-16); max-width: 80ch; }
+.relationship-availability { max-width: 90ch; margin-block-start: var(--sherlock-space-24); }
 .workflow-heading { grid-column: 1 / -1; display: grid; gap: var(--sherlock-space-12); }
 .example-question {
   display: grid;
@@ -110,6 +118,7 @@ html { scroll-padding-block: var(--sherlock-space-24); }
   .repository-pending { font-size: var(--sherlock-type-caption); }
 }
 @media (min-width: 960px) {
+  .relationship-paths { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sherlock-space-48); }
   .slack-context-notes { grid-template-columns: repeat(2,minmax(0,1fr)); gap: var(--sherlock-space-32); }
   .sherlock-skill h3 { min-height: 2.4em; }
   .docs-layout { grid-template-columns: 14rem minmax(0, 1fr); }

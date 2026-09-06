@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1a1 — 6 September 2026
+
+- Added a guided, local-first installer for Claude Code, Codex, and manual agent hosts. It copies only reviewed product files, preserves conflicting host settings, verifies fictional local persistence before registration, and does not connect providers or enable writes.
+- Added a reviewed SHA-256 manifest for every shipped binary asset, expanded credential-pattern detection, and changed release scans to report every match without revealing values.
+- Added the relationship-recovery workflow to the public homepage with the verified dormancy and employer-move rules and explicit operator-review boundary.
+
 ## 0.2.0a1 — 6 September 2026
 
 - Added dormant pitch relationships and pitched-contact employer moves as two portable skills.
