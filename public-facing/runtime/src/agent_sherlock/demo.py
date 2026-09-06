@@ -24,7 +24,7 @@ def run_demo(store: Store) -> dict:
                 metadata={"scope": "website", "fictional": True, "research_run_id": plan["plan"]["id"]},
             )
             store.add_finding(
-                case["id"], statement=f"{subject}: educational video concepts are a useful starting point (fictional).",
+                case["id"], statement=f"{subject} requested educational short-form video concepts (fictional).",
                 evidence_ids=[source["id"]], kind="observed",
             )
         output.append(store.get_case(case["id"]))

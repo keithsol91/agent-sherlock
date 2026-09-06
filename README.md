@@ -29,6 +29,15 @@ terminal in the extracted repository folder. Install
 [uv](https://docs.astral.sh/uv/getting-started/installation/) first. The runtime
 requires Python 3.11 or later; uv can provision a compatible Python when needed.
 
+With Git installed, you can clone it instead:
+
+```sh
+git clone https://github.com/keithsol91/agent-sherlock.git
+cd agent-sherlock
+```
+
+Then run:
+
 ```sh
 uv run --locked --project public-facing/runtime sherlock demo
 ```

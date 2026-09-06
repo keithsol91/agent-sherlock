@@ -25,14 +25,25 @@ use `--output` with a new path when preparing another candidate. Review
 | --- | --- |
 | Five skill files: required frontmatter and naming | Passed locally |
 | Skill scenario review: provenance, injected source instructions, missing tools, fictional counts, uncertain CRM writes | Reviewed; host execution tracked separately |
-| Release packaging controls | Automated tests implemented; final candidate run pending |
-| Runtime, MCP protocol, data lifecycle, mock CRM | Implementation and validation in progress |
-| Fresh install from exact sanitized ZIP | Pending candidate completion |
-| Named agent host installation | See the current compatibility record |
+| Release packaging controls | 19 local tests passed; checked source package and first-commit Git history passed |
+| Runtime, MCP protocol, data lifecycle, mock CRM | 95 tests and 9 subtests passed on the reviewed local candidate; includes 20 fictional personas across independent MCP processes |
+| Fresh source install | Passed with Python 3.11.15, a fresh environment, and an empty dependency cache; 11 CLI operations plus MCP persistence verified |
+| Named agent host | Claude Code 2.1.261 loaded the router and recall skills, saved a fictional case with sourced evidence, and retrieved it after a new host process; initial snapshot `6c5198a` |
 | Live CRM account reads/writes and Slack delivery | Not verified by the fictional demo |
-| GitHub workflow checks | Prepared; no remote run recorded yet |
+| GitHub workflow checks | Initial Linux and macOS matrix and distribution job passed; Windows test cleanup corrected, updated matrix pending |
 | Software license | Proposed MIT for original code and skills; public release requires owner confirmation |
-| Public repository and public promotion | Pending owner approval |
+| GitHub repository | Created as a private review repository; public visibility and promotion require owner approval |
+
+Review repository: [keithsol91/agent-sherlock](https://github.com/keithsol91/agent-sherlock).
+The actual GitHub README, quickstart anchor, and rendered installation guide
+were inspected in an authenticated browser. The local website points to this
+repository; those website edits have not been deployed.
+
+The Claude Code check used only a temporary MCP configuration, project skill
+folders, and fictional records. It did not alter global agent settings or test
+CRM, web research, Slack delivery, or other agent hosts. Its first harness
+disabled all setting sources and therefore hid project skills; enabling only
+the isolated project source verified normal skill discovery in the second process.
 
 The [compatibility record](../public-facing/documentation/compatibility.md)
 distinguishes documented configuration, protocol tests, fixture workflows,
