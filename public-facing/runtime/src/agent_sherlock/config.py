@@ -62,6 +62,17 @@ def load_settings(data_dir: str | Path | None = None, profile: str | None = None
             raise ValueError("Configuration must be a JSON object.")
         if config.get("profile", profile) != profile:
             raise ValueError("Configuration profile does not match the selected profile.")
+        if not isinstance(config.get("connections", {}), dict):
+            raise ValueError("Connections must be a JSON object keyed by connection ID.")
+        if not isinstance(config.get("policy", {}), dict):
+            raise ValueError("Policy must be a JSON object.")
+        for connection_id, connection in config.get("connections", {}).items():
+            if not connection_id or not isinstance(connection, dict):
+                raise ValueError("Each connection needs an ID and a configuration object.")
+            if not isinstance(connection.get("account_id"), str) or not connection["account_id"]:
+                raise ValueError("Each connection needs an explicit account_id string.")
+            if not isinstance(connection.get("operations"), dict) or not isinstance(connection.get("transport"), dict):
+                raise ValueError("Each connection needs operations and transport objects.")
     settings = Settings(root, profile, config)
     settings.ensure_directory()
     return settings

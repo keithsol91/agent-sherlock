@@ -22,7 +22,7 @@ Your host may send research, CRM results, or retrieved evidence to its model pro
 
 ## Connect your own CRM deliberately
 
-The no-key demo does not connect anything. For an optional real connection, use the canonical configuration example shipped with the runtime and the actual adapter schema. Keep that private config outside the repository. Use environment-variable references for credentials rather than placing token values in examples, shell arguments, or chat.
+The no-key demo creates a fictional local connection without contacting external providers. For an optional real connection, use the [integration guide and configuration examples](integrations.md) and the actual adapter schema. Keep that private config outside the repository. Use environment-variable references for credentials rather than placing token values in examples, shell arguments, or chat.
 
 Confirm the selected account identity, supported object types and fields, required scopes, and readback behavior before enabling writes. For a Composio/custom MCP gateway, discover and map its real tool names and response paths. The gateway's own login and permissions remain its responsibility; Sherlock does not create a Composio account or install a provider app for you.
 
@@ -30,7 +30,7 @@ Start with reads and a user-owned test account. `crm_status` reports the connect
 
 ## Approve one exact change
 
-The agent uses `change_propose` to prepare a field update. You review the record identity, current and proposed values, and evidence before applying it.
+The agent uses `change_propose` to prepare a field update. You review the record identity, current and proposed values, evidence, and the exact rendered provider tool call before applying it. Connection-level `writable_fields`, when configured, limits the fields available even for a manually approved proposal.
 
 Using the variables from the install guide, run this yourself in an interactive terminal:
 

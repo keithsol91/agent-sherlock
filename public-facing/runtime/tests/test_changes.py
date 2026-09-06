@@ -1,6 +1,7 @@
 import asyncio
 import json
 import sqlite3
+from contextlib import closing
 
 import pytest
 
@@ -78,7 +79,7 @@ async def test_tampered_stored_payload_is_rejected(setup):
     change = await proposal(manager)
     manager.authorize(change["proposal_id"], change["payload_hash"])
     change["payload"]["fields"]["research_summary"] = "Changed after authorization"
-    with sqlite3.connect(manager.db_path) as db:
+    with closing(sqlite3.connect(manager.db_path)) as db, db:
         db.execute("UPDATE sherlock_changes SET payload=? WHERE id=?", (json.dumps(change["payload"]), change["proposal_id"]))
     with pytest.raises(ChangeError) as error:
         await manager.apply(change["proposal_id"])
@@ -94,7 +95,7 @@ async def test_rejection_and_expiry_do_not_write(setup):
         manager.authorize(rejected["proposal_id"], rejected["payload_hash"])
     expired = await proposal(manager)
     manager.authorize(expired["proposal_id"], expired["payload_hash"])
-    with sqlite3.connect(manager.db_path) as db:
+    with closing(sqlite3.connect(manager.db_path)) as db, db:
         db.execute("UPDATE sherlock_changes SET expires_at=0 WHERE id=?", (expired["proposal_id"],))
     assert (await manager.apply(expired["proposal_id"]))["state"] == "expired"
     assert not writes(transport)

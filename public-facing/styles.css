@@ -49,7 +49,8 @@ html { scroll-padding-block: var(--sherlock-space-24); }
 .docs-header { padding-block: var(--sherlock-space-48); }
 .docs-header h1 { font-size: var(--sherlock-type-h2); max-width: 22ch; }
 .docs-header > * + * { margin-block-start: var(--sherlock-space-24); }
-.docs-layout { display: grid; gap: var(--sherlock-space-48); padding-block-end: var(--sherlock-space-64); }
+.docs-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sherlock-space-48); padding-block-end: var(--sherlock-space-64); }
+.docs-layout > * { min-width: 0; }
 .docs-contents ul { display: flex; flex-wrap: wrap; gap: var(--sherlock-space-8) var(--sherlock-space-24); padding: 0; list-style: none; }
 .docs-contents a { display: inline-flex; align-items: center; min-height: var(--sherlock-size-control-compact); }
 .docs-contents { align-self: start; }

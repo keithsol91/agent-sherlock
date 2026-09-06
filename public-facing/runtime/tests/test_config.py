@@ -22,3 +22,10 @@ def test_profile_data_separation(tmp_path):
     assert a.database != b.database
     assert a.profile_dir.is_dir() and b.profile_dir.is_dir()
 
+
+@pytest.mark.parametrize("config", ['{"connections":[]}', '{"policy":[]}', '{"connections":{"crm":{}}}'])
+def test_invalid_shape_fails_before_doctor_or_serve(tmp_path, config):
+    path = tmp_path / "config.json"
+    path.write_text(config)
+    with pytest.raises(ValueError):
+        load_settings(tmp_path / "data", "default", path)

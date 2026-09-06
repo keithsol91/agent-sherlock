@@ -204,3 +204,26 @@ async def test_stdio_protocol_rejects_cross_case_evidence_and_reports_revision_c
         conflict = await call_error(client, "case_update", case_id=first["id"], expected_revision=1, subject="Stale version")
         assert conflict["code"] == "RevisionConflictError"
         assert (await call_ok(client, "case_get", case_id=first["id"]))["subject"] == first["subject"]
+
+
+async def test_protocol_auto_binds_current_research_run_and_rejects_explicit_stale_run(tmp_path):
+    settings = load_settings(tmp_path / "research runs", "research")
+    async with memory_session(settings) as client:
+        case = await call_ok(client, "case_create", subject="Fictional Study Account", entity_id="study")
+        first_plan = await call_ok(client, "research_prepare", case_id=case["id"], question="What is visible today?", scopes=["website"])
+        source = await call_ok(client, "evidence_add", case_id=case["id"], source_uri="https://study.example/about",
+                               observed_at=OBSERVED_AT, content="Fictional company context.", metadata={"scope": "website"})
+        assert source["metadata"]["research_run_id"] == first_plan["plan"]["id"]
+        assert (await call_ok(client, "research_status", case_id=case["id"]))["state"] == "evidence_recorded"
+
+        current_plan = await call_ok(client, "research_prepare", case_id=case["id"], question="What changed in the next review?", scopes=["website"])
+        before = await call_ok(client, "case_get", case_id=case["id"])
+        error = await call_error(client, "evidence_add", case_id=case["id"], source_uri="https://study.example/delayed",
+                                 observed_at=OBSERVED_AT, content="Fictional result from an old research run.",
+                                 metadata={"scope": "website", "research_run_id": first_plan["plan"]["id"]})
+        assert "plan changed" in error["message"]
+        after = await call_ok(client, "case_get", case_id=case["id"])
+        assert after["revision"] == before["revision"]
+        assert len(after["evidence"]) == 1
+        assert after["metadata"]["research_plan"]["id"] == current_plan["plan"]["id"]
+        assert (await call_ok(client, "research_status", case_id=case["id"]))["coverage"]["website"]["source_count"] == 0

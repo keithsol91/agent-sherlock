@@ -16,7 +16,7 @@ uv run --locked --project "$SHERLOCK_ROOT/runtime" sherlock --data-dir "$SHERLOC
 uv run --locked --project "$SHERLOCK_ROOT/runtime" sherlock --data-dir "$SHERLOCK_DATA" demo
 ```
 
-Dependency installation can use the network. The demo itself uses fictional records in a separate demo profile and does not require CRM, model, or research-provider keys. It proves the local demonstration path only. A passing doctor does not prove a live provider connection or host installation.
+Dependency installation can use the network. The demo itself uses fictional records in a separate demo profile and does not require CRM, model, or research-provider keys. It creates a private demo config and a fictional CRM store, and prints their actual location plus the fixture record/connection IDs. The summary includes `fictional: true`, `network_calls: 0`, and two fictional medical clients. Add `--full` after `demo` for the expanded case/evidence output. This proves the local demonstration path only. A passing doctor does not prove a live provider connection or host installation.
 
 Global options such as `--data-dir`, `--profile`, and `--config` go **before** `doctor`, `demo`, `serve`, and the other subcommands. Keep the same data directory and profile in your host configuration and later operating commands.
 
@@ -104,4 +104,4 @@ Ask the host to discover Sherlock's tools and call `sherlock_status`. In a dedic
 
 Do not run `serve` as a background web server: it is a stdio process started by the MCP host and waits for protocol messages on stdin. It does not supply a browser sign-in page or public HTTP endpoint.
 
-Next: [daily recipes](daily-recipes.md), [permissions and CRM setup](permissions.md), and [troubleshooting](troubleshooting.md).
+Next: [daily recipes](daily-recipes.md), [CRM integrations](integrations.md), [permissions](permissions.md), [operations](operations.md), and [troubleshooting](troubleshooting.md).

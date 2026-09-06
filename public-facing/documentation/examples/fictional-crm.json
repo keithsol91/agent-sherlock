@@ -5,7 +5,7 @@
       "account_id": "fictional-account",
       "transport": {
         "type": "fictional_fixture",
-        "state_path": "/absolute/path/to/private/sherlock-data/demo/demo-crm.json"
+        "state_path": "/absolute/path/to/private/sherlock-data/demo/fixture-crm.sqlite3"
       },
       "operations": {
         "identify_account": {

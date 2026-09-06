@@ -6,6 +6,7 @@ from contextlib import asynccontextmanager
 from functools import wraps
 
 from mcp.server import MCPServer
+from mcp.types import ToolAnnotations
 
 from . import __version__
 from .config import Settings
@@ -65,7 +66,12 @@ def build_server(settings: Settings, gateway=None) -> MCPServer:
         ),
     )
 
-    @server.tool()
+    def tool(*, read_only: bool = False, external: bool = False, destructive: bool = False):
+        return server.tool(annotations=ToolAnnotations(
+            read_only_hint=read_only, destructive_hint=destructive, open_world_hint=external,
+        ))
+
+    @tool(read_only=True)
     @guarded
     async def sherlock_status() -> dict:
         """Read local version and configuration status without contacting providers."""
@@ -77,14 +83,14 @@ def build_server(settings: Settings, gateway=None) -> MCPServer:
             "external_approval": "operator_review_by_default",
         }
 
-    @server.tool()
+    @tool()
     @guarded
     async def case_create(subject: str, entity_id: str, category: str | None = None,
                           case_type: str = "account", metadata: dict | None = None) -> dict:
         """Create a case in this profile. Use client type only for known past clients."""
         return store.create_case(subject, entity_id, category, case_type, metadata)
 
-    @server.tool()
+    @tool(read_only=True)
     @guarded
     async def case_get(case_id: str) -> dict:
         """Read one authorized case, including evidence, findings, and corrections."""
@@ -93,13 +99,13 @@ def build_server(settings: Settings, gateway=None) -> MCPServer:
             raise LookupError("Case not found in this profile.")
         return result
 
-    @server.tool()
+    @tool(read_only=True)
     @guarded
     async def case_list() -> dict:
         """List cases in this process's fixed profile."""
         return {"cases": store.list_cases()}
 
-    @server.tool()
+    @tool()
     @guarded
     async def case_update(case_id: str, expected_revision: int, subject: str | None = None,
                           category: str | None = None, status: str | None = None,
@@ -108,12 +114,12 @@ def build_server(settings: Settings, gateway=None) -> MCPServer:
         return store.update_case(case_id, expected_revision=expected_revision, subject=subject,
                                  category=category, status=status, metadata=metadata)
 
-    @server.tool()
+    @tool()
     @guarded
     async def evidence_add(case_id: str, source_uri: str, observed_at: str,
                            source_state: str = "observed", content: str = "",
                            metadata: dict | None = None) -> dict:
-        """Record bounded host-supplied evidence and actual source state; use metadata.scope for research coverage."""
+        """Record host evidence and metadata.scope. Binds to the active plan; supply metadata.research_run_id to reject stale collection."""
         metadata = dict(metadata or {})
         case = store.get_case(case_id)
         if case is None:
@@ -126,7 +132,7 @@ def build_server(settings: Settings, gateway=None) -> MCPServer:
         return store.add_evidence(case_id, source_uri=source_uri, observed_at=observed_at,
                                   source_state=source_state, content=content, metadata=metadata)
 
-    @server.tool()
+    @tool()
     @guarded
     async def finding_add(case_id: str, statement: str, evidence_ids: list[str],
                           kind: str = "observed", confidence: str | None = None) -> dict:
@@ -134,7 +140,7 @@ def build_server(settings: Settings, gateway=None) -> MCPServer:
         return store.add_finding(case_id, statement=statement, evidence_ids=evidence_ids,
                                  kind=kind, confidence=confidence)
 
-    @server.tool()
+    @tool()
     @guarded
     async def finding_correct(finding_id: str, statement: str, reason: str,
                               evidence_ids: list[str] | None = None) -> dict:
@@ -142,70 +148,70 @@ def build_server(settings: Settings, gateway=None) -> MCPServer:
         return store.correct_finding(finding_id, statement=statement, reason=reason,
                                      evidence_ids=evidence_ids)
 
-    @server.tool()
+    @tool()
     @guarded
     async def research_prepare(case_id: str, question: str, scopes: list[str],
                                time_window: str | None = None) -> dict:
         """Prepare a research plan. Supported scopes: organic, community, paid_creative, website, crm, user_history."""
         return research.prepare(store, case_id, question, scopes, time_window)
 
-    @server.tool()
+    @tool(read_only=True)
     @guarded
     async def research_status(case_id: str) -> dict:
         """Report recorded source coverage. This does not independently validate host research."""
         return research.status(store, case_id)
 
-    @server.tool()
+    @tool(read_only=True)
     @guarded
     async def recall_search(query: str, category: str | None = None, limit: int = 20) -> dict:
         """Retrieve matching current findings and provenance only from this profile."""
         return {"matches": store.recall_search(query, category=category, limit=limit),
                 "coverage": "Recorded local context only; no match does not establish that work never happened."}
 
-    @server.tool()
+    @tool(read_only=True)
     @guarded
     async def recall_count(category: str | None = None, case_type: str = "client") -> dict:
         """Count exact distinct known entities of one type; default counts clients, excluding leads and competitors."""
         return store.recall_count(category, case_type=case_type)
 
-    @server.tool()
+    @tool(read_only=True, external=True)
     @guarded
     async def crm_status(connection_id: str) -> dict:
         """Contact one operator-configured CRM connection and verify account/tool mappings."""
         return await gateway.status(connection_id)
 
-    @server.tool()
+    @tool(read_only=True, external=True)
     @guarded
     async def crm_search(connection_id: str, query: str, limit: int = 20) -> dict:
         """Search the explicitly configured CRM account; ambiguous matches require user resolution."""
         return await gateway.search_records(connection_id, query, limit=limit)
 
-    @server.tool()
+    @tool(read_only=True, external=True)
     @guarded
     async def crm_read(connection_id: str, record_id: str) -> dict:
         """Read a record by native ID and verify its configured destination account."""
         return await gateway.read_record(connection_id, record_id)
 
-    @server.tool()
+    @tool(external=True)
     @guarded
     async def change_propose(connection_id: str, record_id: str, fields: dict,
                              evidence: list[dict]) -> dict:
         """Prepare an exact CRM field change. This tool cannot authorize its own proposal."""
         return await changes.propose(connection_id, record_id, fields, evidence)
 
-    @server.tool()
+    @tool(external=True, destructive=True)
     @guarded
     async def change_apply(proposal_id: str) -> dict:
         """Apply only an already authorized, unexpired proposal. Unknown outcomes must be reconciled, never blindly retried."""
         return await changes.apply(proposal_id)
 
-    @server.tool()
+    @tool(read_only=True)
     @guarded
     async def change_status(proposal_id: str) -> dict:
         """Read actual proposal state; only verified provider readback establishes a saved change."""
         return changes.get(proposal_id)
 
-    @server.tool()
+    @tool(external=True)
     @guarded
     async def change_reconcile(proposal_id: str) -> dict:
         """Read back an interrupted or uncertain CRM change without attempting another write."""

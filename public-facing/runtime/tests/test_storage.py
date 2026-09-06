@@ -1,6 +1,7 @@
 """Storage invariants tested against real SQLite, not mocked persistence."""
 
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from pathlib import Path
 import sqlite3
 import tempfile
@@ -139,7 +140,7 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(self.store.export_profile()["cases"], [])
         self.assertEqual(self.store.recall_search("Corrected"), [])
         self.assertEqual(self.store.recall_count()["count"], 0)
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db:
             for table in ("cases", "evidence", "findings", "finding_evidence", "finding_history"):
                 self.assertEqual(db.execute(f"SELECT COUNT(*) FROM {table} WHERE profile=?", ("alpha",)).fetchone()[0], 0)
             self.assertEqual(db.execute("PRAGMA foreign_key_check").fetchall(), [])
@@ -168,7 +169,7 @@ class StoreTests(unittest.TestCase):
         current = self.store.get_case(case["id"])
         self.assertEqual(len(current["evidence"]), 12)
         self.assertEqual(current["revision"], 13)
-        with sqlite3.connect(self.path) as db:
+        with closing(sqlite3.connect(self.path)) as db:
             self.assertEqual(db.execute("PRAGMA journal_mode").fetchone()[0], "wal")
 
     def test_backup_round_trip_is_profile_scoped_and_does_not_overwrite(self):

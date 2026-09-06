@@ -1,5 +1,6 @@
 import json
 import sqlite3
+from contextlib import closing
 
 import pytest
 
@@ -16,7 +17,7 @@ def seed(settings):
 def test_backup_restore_preserves_cases_but_does_not_replay_external_approvals(tmp_path):
     original = load_settings(tmp_path / "original", "clinic")
     case = seed(original)
-    with sqlite3.connect(original.changes_database) as db:
+    with closing(sqlite3.connect(original.changes_database)) as db, db:
         db.execute("CREATE TABLE approvals (state TEXT)")
         db.execute("INSERT INTO approvals VALUES ('approved')")
     destination = tmp_path / "backup"
@@ -63,3 +64,9 @@ def test_backup_rejects_manifest_path_escape(tmp_path):
     with pytest.raises(ValueError, match="invalid data files"):
         restore(settings, source, "a")
 
+
+def test_empty_profile_does_not_produce_unrestorable_backup(tmp_path):
+    settings = load_settings(tmp_path / "data", "a")
+    with pytest.raises(ValueError, match="no case database"):
+        backup(settings, tmp_path / "backup")
+    assert not (tmp_path / "backup").exists()

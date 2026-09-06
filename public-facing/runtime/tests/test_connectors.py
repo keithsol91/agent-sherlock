@@ -1,6 +1,9 @@
 import copy
+import asyncio
 import json
 import os
+import socket
+import subprocess
 import sys
 
 import pytest
@@ -10,6 +13,7 @@ from agent_sherlock.connectors import (
     ConnectorGateway,
     FixtureTransport,
     MCPTransport,
+    composio_hubspot_connection_config,
     fixture_connection_config,
 )
 
@@ -143,6 +147,49 @@ async def test_discovery_pagination_is_complete_before_execution(fixture_gateway
     assert result["records"]
 
 
+@pytest.mark.parametrize("empty", [False, True])
+async def test_search_accepts_omitted_final_page_cursor(fixture_gateway, empty):
+    gateway, transport = fixture_gateway
+    mapping = gateway.connections["fictional-demo"]["operations"]["search_records"]
+    mapping["result"]["next_cursor"] = "paging.next.after"
+    original = transport.call_tool
+
+    async def final_page(name, arguments):
+        response = await original(name, arguments)
+        if name == "fictional_search_records":
+            response["structuredContent"].pop("next_cursor", None)
+            if empty:
+                response["structuredContent"]["records"] = []
+        return response
+
+    transport.call_tool = final_page
+    result = await gateway.search_records("fictional-demo", "Acorn")
+    assert result["more_results"] is False
+    assert len(result["records"]) == (0 if empty else 1)
+    assert result["coverage"] == "bounded_search"
+
+
+async def test_inspection_executes_no_tools_and_does_not_approve_mappings(fixture_gateway):
+    gateway, transport = fixture_gateway
+    gateway.connections["fictional-demo"]["operations"] = {}
+    inspected = await gateway.inspect_tools("fictional-demo")
+    assert len(inspected["tools"]) == 4
+    assert inspected["account_verified"] is False
+    assert inspected["review_required"] is True
+    assert not transport.calls
+    assert gateway.connections["fictional-demo"]["operations"] == {}
+
+
+async def test_write_preview_requires_complete_payload_and_native_id(fixture_gateway):
+    gateway, _ = fixture_gateway
+    call = gateway.write_preview("fictional-demo", "company-001", {"industry": "Other"})
+    assert call["arguments"]["fields"] == {"industry": "Other"}
+    gateway.connections["fictional-demo"]["operations"]["update_fields"]["arguments"]["fields"] = {"industry": "hidden constant"}
+    with pytest.raises(ConnectorError) as error:
+        gateway.write_preview("fictional-demo", "company-001", {"industry": "Other"})
+    assert error.value.code == "unsafe_mapping"
+
+
 async def test_fictional_transport_persists_across_instances(tmp_path):
     config = fixture_connection_config(tmp_path / "fixture.sqlite3")
     first = ConnectorGateway(config)
@@ -191,3 +238,120 @@ if __name__ == "__main__":
     record = await gateway.read_record("sdk-fixture", "native-id-17")
     assert record["record_id"] == "native-id-17"
     assert record["fields"]["name"] == "Fictional SDK Company"
+
+
+async def test_official_sdk_streamable_http_local_fixture(tmp_path):
+    """Exercise HTTP transport only against a fictional loopback subprocess."""
+    with socket.socket() as listener:
+        listener.bind(("127.0.0.1", 0))
+        port = listener.getsockname()[1]
+    server = tmp_path / "http_fixture.py"
+    server.write_text(f'''from mcp.server import MCPServer
+mcp = MCPServer("Fictional HTTP CRM test")
+@mcp.tool()
+def account_info() -> dict:
+    return {{"account_id": "fictional-http-account"}}
+if __name__ == "__main__":
+    mcp.run(transport="streamable-http", host="127.0.0.1", port={port})
+''')
+    process = subprocess.Popen([sys.executable, str(server)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        for _ in range(100):
+            if process.poll() is not None:
+                pytest.fail("Local fictional HTTP server stopped before startup")
+            try:
+                _, writer = await asyncio.open_connection("127.0.0.1", port)
+                writer.close()
+                await writer.wait_closed()
+                break
+            except OSError:
+                await asyncio.sleep(0.03)
+        else:
+            pytest.fail("Local fictional HTTP server did not start")
+        async with MCPTransport({"type": "streamable_http", "url": f"http://127.0.0.1:{port}/mcp"}).open() as client:
+            tools = await client.list_tools()
+            assert tools.tools[0].name == "account_info"
+            result = await client.call_tool("account_info", {})
+            payload = result.structured_content or json.loads(result.content[0].text)
+            assert payload["account_id"] == "fictional-http-account"
+    finally:
+        process.terminate()
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait(timeout=5)
+
+
+class NativeComposioContractFixture(FixtureTransport):
+    """Fictional direct-tool envelope contract, not a live Composio recording.
+
+    Native slugs/argument names and successful/data envelope follow Composio's
+    public HubSpot catalog. These minimal test schemas are intentionally NOT
+    shipped as production schema pins: real endpoints must be inspected.
+    """
+
+    ALIASES = {
+        "HUBSPOT_GET_ACCOUNT_INFO": "fictional_account",
+        "HUBSPOT_GET_COMPANY": "fictional_get_record",
+        "HUBSPOT_SEARCH_COMPANIES": "fictional_search_records",
+        "HUBSPOT_UPDATE_COMPANY": "fictional_update_fields",
+    }
+
+    def __init__(self):
+        super().__init__()
+        self.schemas = {
+            "HUBSPOT_GET_ACCOUNT_INFO": {"type": "object", "properties": {}, "additionalProperties": False},
+            "HUBSPOT_GET_COMPANY": {"type": "object", "properties": {"companyId": {"type": "string"}, "properties": {"type": "array", "items": {"type": "string"}}}, "required": ["companyId"], "additionalProperties": False},
+            "HUBSPOT_SEARCH_COMPANIES": {"type": "object", "properties": {"query": {"type": "string"}, "limit": {"type": "integer"}, "properties": {"type": "array", "items": {"type": "string"}}}, "required": ["query", "limit"], "additionalProperties": False},
+            "HUBSPOT_UPDATE_COMPANY": {"type": "object", "properties": {"companyId": {"type": "string"}, "properties": {"type": "object", "additionalProperties": {"type": "string"}}}, "required": ["companyId", "properties"], "additionalProperties": False},
+        }
+        self.successful = True
+
+    async def call_tool(self, name, arguments):
+        translated = {"account_id": self.account_id}
+        if "companyId" in arguments:
+            translated["record_id"] = arguments["companyId"]
+        if name == "HUBSPOT_UPDATE_COMPANY":
+            translated["fields"] = arguments["properties"]
+        if name == "HUBSPOT_SEARCH_COMPANIES":
+            translated.update(query=arguments["query"], limit=arguments["limit"])
+        response = await super().call_tool(self.ALIASES[name], translated)
+        data = response.get("structuredContent", {})
+        if name == "HUBSPOT_GET_ACCOUNT_INFO":
+            data = {"hubId": self.account_id}
+        elif "id" in data:
+            data = {"id": data["id"], "properties": data["fields"]}
+        elif "records" in data:
+            data = {"results": [{"id": row["id"], "properties": row["fields"]} for row in data["records"]]}
+        return {"structuredContent": {"data": json.dumps(data), "successful": self.successful, "error": None}, "isError": False}
+
+
+async def test_composio_direct_tool_mapping_contract_and_reviewed_schema_generator(tmp_path):
+    from agent_sherlock.changes import ChangeManager
+
+    transport = NativeComposioContractFixture()
+    inspect_gateway = ConnectorGateway({"connections": {"composio": {"account_id": "fictional-account", "operations": {}}}}, {"composio": transport})
+    inspected = await inspect_gateway.inspect_tools("composio")
+    config = composio_hubspot_connection_config(inspected, connection_id="composio", account_id="fictional-account", transport={"type": "streamable_http", "url": "https://example.com/operator-supplied-direct-session"}, properties=["name", "research_summary"], account_id_path="data.hubId")
+    gateway = ConnectorGateway(config, {"composio": transport})
+    assert (await gateway.status("composio"))["account_verified"] is True
+    assert (await gateway.search_records("composio", "Acorn"))["records"][0]["record_id"] == "company-001"
+    manager = ChangeManager(tmp_path / "composio-contract.sqlite3", gateway)
+    change = await manager.propose("composio", "company-001", {"research_summary": "Fictional direct-tool finding"}, [{"source_url": "https://example.com/fictional"}])
+    assert change["payload"]["provider_call"]["arguments"] == {"companyId": "company-001", "properties": {"research_summary": "Fictional direct-tool finding"}}
+    manager.authorize(change["proposal_id"], change["payload_hash"])
+    assert (await manager.apply(change["proposal_id"]))["state"] == "verified"
+    with pytest.raises(ConnectorError) as error:
+        gateway.write_preview("composio", "company-001", {"unreviewed_field": "x"})
+    assert error.value.code == "unsupported_fields"
+    transport.successful = False
+    with pytest.raises(ConnectorError) as error:
+        await gateway.read_record("composio", "company-001")
+    assert error.value.code == "tool_error"
+
+
+def test_composio_generator_rejects_shared_meta_tool_endpoint():
+    with pytest.raises(ConnectorError) as error:
+        composio_hubspot_connection_config({"tools": [{"name": "COMPOSIO_MULTI_EXECUTE_TOOL", "input_schema": {"type": "object"}}]}, connection_id="composio", account_id="fictional", transport={}, properties=["name"], account_id_path="data.hubId")
+    assert error.value.code == "missing_composio_tools"

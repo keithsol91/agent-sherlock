@@ -7,7 +7,7 @@ import json
 import os
 import shutil
 import sqlite3
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from pathlib import Path
 
 from . import __version__
@@ -62,6 +62,10 @@ def backup(settings: Settings, destination: str | Path) -> dict:
     if destination.is_relative_to(settings.profile_dir):
         raise ValueError("Store backups outside the active profile directory.")
     with service_lock(settings):
+        if not settings.database.is_file():
+            raise ValueError("This profile has no case database to back up. Run doctor or initialize the service first.")
+        if any((settings.profile_dir / name).is_symlink() for name in DATA_FILES):
+            raise ValueError("Data files must not be symbolic links.")
         destination.mkdir(parents=True, mode=0o700)
         files = {}
         for name in DATA_FILES:
@@ -72,8 +76,8 @@ def backup(settings: Settings, destination: str | Path) -> dict:
                 raise ValueError("Data files must not be symbolic links.")
             target = destination / name
             if name.endswith(".sqlite3"):
-                with sqlite3.connect(source.as_uri() + "?mode=ro", uri=True) as original:
-                    with sqlite3.connect(target) as snapshot:
+                with closing(sqlite3.connect(source.as_uri() + "?mode=ro", uri=True)) as original:
+                    with closing(sqlite3.connect(target)) as snapshot:
                         original.backup(snapshot)
             else:
                 shutil.copyfile(source, target)
@@ -100,7 +104,7 @@ def restore(settings: Settings, source: str | Path, confirmation: str) -> dict:
         if item.is_symlink() or digest(item) != expected:
             raise ValueError("Backup integrity check failed.")
         if name.endswith(".sqlite3"):
-            with sqlite3.connect(item.as_uri() + "?mode=ro", uri=True) as db:
+            with closing(sqlite3.connect(item.as_uri() + "?mode=ro", uri=True)) as db:
                 if db.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
                     raise ValueError("Backup database integrity check failed.")
     with service_lock(settings):

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="Meet Agent Sherlock: an AI detective for social competitor research, account context, living case files, and shared memory for your team of agents. Public edition in development." />
+    <meta name="description" content="Meet Agent Sherlock: an AI detective for social competitor research, account context, living case files, and shared memory for your team of agents. Local skills and MCP preview." />
     <title>Agent Sherlock — Social intelligence for your team</title>
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="assets/styles/fonts.css" />
@@ -22,7 +22,7 @@
           <li><a class="sherlock-nav-link" href="#capabilities">Skills</a></li>
           <li><a class="sherlock-nav-link" href="docs.html">Docs</a></li>
           <li><a class="sherlock-nav-link" href="docs.html#contribute">Contribute</a></li>
-          <li><span class="repository-pending">GitHub <span class="sherlock-caption sherlock-muted">coming soon</span></span></li>
+          <li><a class="sherlock-nav-link" href="https://github.com/keithsol91/agent-sherlock">GitHub</a></li>
         </ul>
       </nav>
     </header>
@@ -34,10 +34,10 @@
           <h1 id="hero-title">Meet your new AI detective.</h1>
           <p class="sherlock-lead">Sherlock investigates competitors’ social activity, researches leads and accounts, keeps CRM and case files current, and remembers the facts your other agents need.</p>
           <div class="sherlock-actions">
-            <a class="sherlock-button" href="#capabilities">Explore Sherlock’s skills</a>
+            <a class="sherlock-button" href="https://github.com/keithsol91/agent-sherlock">View on GitHub</a>
             <a class="sherlock-link" href="docs.html">Read the docs</a>
           </div>
-          <p class="sherlock-caption sherlock-muted">Public edition in development. Explore what we’re building.</p>
+          <p class="sherlock-caption sherlock-muted">Local alpha for your existing agent. Start with the fictional, no-key demo.</p>
           <a class="slack-entry sherlock-link" href="#slack"><img src="assets/brands/slack-logo.svg" width="24" height="24" alt="" /> Meet Sherlock in Slack</a>
         </div>
         <img class="sherlock-hero-art" src="assets/sherlock-hero-candidate.png" width="1312" height="1199" alt="Sherlock examining a clue with a magnifying glass behind a blue case folder" fetchpriority="high" />
@@ -46,20 +46,20 @@
       <section id="agents" class="sherlock-section sherlock-container agent-compatibility" aria-labelledby="agents-title">
         <h2 id="agents-title">Built to work with your agents.</h2>
         <p class="agent-compatibility-intro">Your tools. Sherlock’s skills and context. The goal is to make useful research and memory portable across the agents you already use.</p>
-        <ul class="agent-logo-list" aria-label="Planned agent compatibility">
+        <ul class="agent-logo-list" aria-label="Agent compatibility targets">
           <li><img src="assets/brands/claude-mark.png" width="32" height="32" alt="" /><span>Claude Code</span></li>
           <li><img src="assets/brands/chatgpt-mark.svg" width="32" height="32" alt="" /><span>ChatGPT</span></li>
           <li><img src="assets/brands/hermes-mark.png" width="32" height="32" alt="" /><span>Hermes Agent</span></li>
           <li><img src="assets/brands/openclaw-mark.svg" width="32" height="32" alt="" /><span>OpenClaw</span></li>
           <li class="agent-logo-more">And more.</li>
         </ul>
-        <p class="sherlock-caption sherlock-muted agent-compatibility-note"><strong>Planned compatibility.</strong> Public setup and supported features are still being validated for each tool. <a class="sherlock-link" href="docs.html#compatibility">Compatibility details</a></p>
+        <p class="sherlock-caption sherlock-muted agent-compatibility-note"><strong>Check your host’s setup.</strong> Local MCP support varies by host. ChatGPT web needs a separate remote service. <a class="sherlock-link" href="docs.html#compatibility">Compatibility details</a></p>
       </section>
 
       <section id="capabilities" class="sherlock-section sherlock-container" aria-labelledby="capabilities-title">
         <div class="section-intro">
           <h2 id="capabilities-title">A few things Sherlock can do.</h2>
-          <p>Built around social research, with useful context for sales, strategy, and the rest of your agents. These are the planned capabilities of the public edition.</p>
+          <p>Built around social research, with useful context for sales, strategy, and the rest of your agents. Research uses your host’s tools; CRM actions use the connection and permissions you configure.</p>
         </div>
         <ul class="sherlock-skills">
           <li class="sherlock-skill">
@@ -124,7 +124,7 @@
           <p><strong>Build Sherlock into your Slack workflow.</strong> Ask who you’ve worked with, how many clients fit an industry, and what the team did for them.</p>
           <p><strong>Built around the context he has.</strong> The answer reflects the records Sherlock can access, so the source history and any gaps matter.</p>
         </div>
-        <p class="sherlock-caption sherlock-muted slack-availability">Based on the team’s existing Slack workflow. Setup for the public edition is in development. <a class="sherlock-link" href="docs.html#slack">How Sherlock fits into Slack</a></p>
+        <p class="sherlock-caption sherlock-muted slack-availability">Use Sherlock through your own agent’s authorized Slack connection. These conversations are fictional; verify delivery in your workspace. <a class="sherlock-link" href="docs.html#slack">How Sherlock fits into Slack</a></p>
       </section>
 
       <section id="workflow" class="sherlock-section sherlock-container" aria-labelledby="workflow-title">
@@ -137,7 +137,7 @@
             <p class="sherlock-caption sherlock-muted">A question for Sherlock</p>
             <h3>What changed in our competitor’s social strategy?</h3>
             <p>Follow a new content pattern from the public posts that reveal it to the account context your team can use.</p>
-            <p class="sherlock-caption sherlock-muted">Fictional example of the planned workflow.</p>
+            <p class="sherlock-caption sherlock-muted">Fictional example workflow; external saves depend on your configured connection.</p>
           </div>
           <ol class="workflow-steps">
             <li>
@@ -159,12 +159,12 @@
       <section id="open-source" class="sherlock-section sherlock-container participation" aria-labelledby="open-source-title">
         <div class="sherlock-stack">
           <h2 id="open-source-title">Your detective. Your repo to explore.</h2>
-          <p class="sherlock-lead">The plan: free, open-source software you can use, inspect, and extend for your own team of agents.</p>
+          <p class="sherlock-lead">Explore Sherlock’s skills, run the local demo, and make the detective part of your own agent workflow.</p>
           <div class="sherlock-actions">
-            <a class="sherlock-button" href="docs.html">Explore the project</a>
+            <a class="sherlock-button" href="https://github.com/keithsol91/agent-sherlock">Get started on GitHub</a>
             <a class="sherlock-link" href="docs.html#contribute">Help shape Sherlock</a>
           </div>
-          <p class="sherlock-caption sherlock-muted">The GitHub repository and software license are being prepared.</p>
+          <p class="sherlock-caption sherlock-muted">The GitHub preview includes setup instructions, five skills, and the local MCP service. Review its current compatibility before connecting your tools.</p>
           <p class="sherlock-caption sherlock-muted">Sherlock is free. Model providers and connected services may charge separately.</p>
         </div>
       </section>
@@ -175,7 +175,7 @@
       <nav aria-label="Footer navigation">
         <ul class="sherlock-nav-list">
           <li><a class="sherlock-nav-link" href="docs.html">Docs</a></li>
-          <li><span class="repository-pending sherlock-muted">GitHub coming soon</span></li>
+          <li><a class="sherlock-nav-link" href="https://github.com/keithsol91/agent-sherlock">GitHub</a></li>
           <li><a class="sherlock-nav-link" href="docs.html#contribute">Contribute</a></li>
         </ul>
       </nav>

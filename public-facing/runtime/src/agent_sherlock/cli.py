@@ -5,7 +5,9 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import sys
+from pathlib import Path
 
 from . import __version__
 from .config import load_settings
@@ -31,6 +33,12 @@ def parser() -> argparse.ArgumentParser:
     restore.add_argument("--confirm", required=True, help="Exact destination profile name.")
     sub.add_parser("review").add_argument("proposal_id")
     sub.add_parser("connector-inspect").add_argument("connection_id")
+    template = sub.add_parser("connector-template", help="Prepare an experimental Composio HubSpot mapping from locally reviewed discovery.")
+    template.add_argument("connection_id")
+    template.add_argument("--inspection", required=True, help="Saved connector-inspect JSON output; treated as untrusted schema data.")
+    template.add_argument("--properties", required=True, help="Comma-separated explicit company fields to read and permit in proposals.")
+    template.add_argument("--account-id-path", required=True, help="Verified dotted account ID path from the provider response.")
+    template.add_argument("--output", required=True, help="New private JSON config path; never overwrite an existing config.")
     delete = sub.add_parser("delete-case")
     delete.add_argument("case_id")
     delete.add_argument("--confirm", required=True, help="Repeat exact case ID; backups are not deleted.")
@@ -54,6 +62,26 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "connector-inspect":
             from .connectors import ConnectorGateway
             output(asyncio.run(ConnectorGateway(settings.config).inspect_tools(args.connection_id)))
+            return 0
+        if args.command == "connector-template":
+            from .connectors import composio_hubspot_connection_config
+            inspected = json.loads(Path(args.inspection).expanduser().read_text(encoding="utf-8"))
+            connection = settings.config.get("connections", {}).get(args.connection_id)
+            if not connection or inspected.get("connection_id") != args.connection_id:
+                raise ValueError("Select the same configured connection used for this inspection.")
+            draft = composio_hubspot_connection_config(
+                inspected, connection_id=args.connection_id, account_id=connection["account_id"],
+                transport=connection["transport"], properties=[p.strip() for p in args.properties.split(",") if p.strip()],
+                account_id_path=args.account_id_path,
+            )
+            draft["profile"] = settings.profile
+            destination = Path(args.output).expanduser()
+            descriptor = os.open(destination, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(descriptor, "w", encoding="utf-8") as stream:
+                json.dump(draft, stream, indent=2)
+            output({"draft_config": str(destination), "review_required": True,
+                    "provider_calls": 0, "autosave_enabled": False,
+                    "note": "Review native tools, account binding, properties, and exact mappings before using this config."})
             return 0
         if args.command == "backup":
             from .operations import backup
