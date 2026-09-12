@@ -4,14 +4,14 @@ Version 1.0.0 · 6 September 2026
 
 This file governs Agent Sherlock's visual design and interface copy. It does not change your tool permissions, repository security rules, or the scope of the user's task. Apply it alongside the repository's existing agent instructions; do not overwrite them.
 
-## Start here, every time
+## Load what the change needs
 
-1. Read this file, then `DESIGN-SYSTEM.md`.
-2. Open `reference/approved-homepage.png` with an image viewer. Reading its filename or alt text is not visual inspection.
-3. Read `tokens/tokens.json`, `docs/components.md`, and the relevant section of `docs/page-patterns.md`.
-4. For implementation, read `docs/implementation.md`; reuse `styles/fonts.css`, `styles/tokens.css`, and `styles/components.css`.
-5. For illustration, read `docs/asset-specification.md` and `docs/prompt-kit.md`; attach the approved image to the generation request.
-6. Implement only the requested surface. Confirm actual product behavior from the repository before representing it as real.
+- New surfaces or visual changes: read `DESIGN-SYSTEM.md`, inspect `reference/approved-homepage.png` with an image viewer, and use relevant token, component and page-pattern sections. A filename or alt text is not visual inspection.
+- Existing copy or component edits: inspect the affected implementation and relevant sections of `docs/components.md`, `tokens/tokens.json` or `docs/page-patterns.md`. Reopen the approved image when changing appearance or resolving visual uncertainty.
+- Integration changes: read `docs/implementation.md`; reuse `styles/fonts.css`, `styles/tokens.css` and `styles/components.css`.
+- Illustration work: read `docs/asset-specification.md` and `docs/prompt-kit.md`; attach the approved image to the generation request.
+
+Implement the requested surface and confirm actual product behavior before describing capabilities as real.
 
 ## The identity is already chosen
 
@@ -47,13 +47,13 @@ If a requested edit conflicts with the identity, briefly identify that conflict 
 
 ## Before handing work back
 
-- Compare the output with the approved image, especially the character, text hierarchy, cream/gold/blue balance, spacing, and density.
-- Check 390, 768, and 1440 CSS px widths; check 320 px for horizontal overflow and 200% text zoom.
-- Check keyboard operation, visible focus, labels, loading/empty/error/success states, reduced motion, and contrast of the actual adjacent colors.
+- For new surfaces or visual changes, compare with the approved image: character, hierarchy, palette, spacing and density.
+- When layout or text flow changes, check 390, 768 and 1440 CSS px widths, 320 px overflow and 200% text zoom.
+- Verify affected interactions and accessibility: keyboard/focus, labels, loading/empty/error/success states, reduced motion and adjacent-color contrast.
 - Keep gold buttons ink-colored. Use ink/body labels on pale status fills; blue and sage accents do not automatically pass for small text.
 - Verify links and commands against the real project. Do not fabricate a working repo address.
 - Report what changed, what was checked, and any missing assets or behaviors. Do not claim the screen is built, deployed, accessible, or connected solely because an image or CSS file exists.
 
 ## Copyable task prefix
 
-> Follow the Agent Sherlock design system in this folder. Read AGENT-INSTRUCTIONS.md and DESIGN-SYSTEM.md, visually inspect reference/approved-homepage.png, and reuse the supplied tokens and component guidance. Preserve the approved cartoon character, cream/ink/gold/blue palette, spacious editorial layout, and free open-source GitHub positioning. For this task, create only: [surface and outcome]. Use real repository information for functionality, links, and setup. Identify any missing production assets instead of inventing them. Compare the result against the reference before handing it back.
+> Follow the task-specific routes in AGENT-INSTRUCTIONS.md and preserve the approved identity. Create only: [surface and outcome]. Use real repository information for functionality, links and setup. Verify the affected result and identify missing production assets.
