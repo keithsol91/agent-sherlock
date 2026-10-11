@@ -8,7 +8,7 @@ version = "0.2.1a2"
 description = "Local evidence, case files, recall, and controlled CRM tools for your agent."
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["mcp==2.1.1"]
+dependencies = ["mcp==2.3.0"]
 
 [project.scripts]
 sherlock = "agent_sherlock.cli:main"
